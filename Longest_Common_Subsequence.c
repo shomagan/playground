@@ -14,21 +14,22 @@ static void find(unsigned char a_first_symbol,unsigned char b_first_symbol){
   unsigned char l,m;
   if (a_first_symbol==number_a_char_reduce){
     
-    if (common_char_number>max_common_char_number){
+//    if (common_char_number>max_common_char_number){
       max_common_char_number=common_char_number;
       unsigned char n;
       for (n = 0;n<(common_char_number);n++){
         max_common_sequence_char[n] = common_sequence_char[n];
-//        printf("%c",common_sequence_char[n]);
+        printf("%c",common_sequence_char[n]);
       }
-//        printf("\n");
-    }
+        printf("\n");
+  //  }
 
   }
-  for (l=a_first_symbol;l<number_a_char;l++){
-    for (m=b_first_symbol;m<number_b_char;m++){
+  for (l=a_first_symbol;l<number_a_char_reduce;l++){
+    for (m=b_first_symbol;m<number_b_char_reduce;m++){
       if (a_char[l]==b_char[m]){
-        common_sequence_char[common_char_number] = b_char[m]; 
+
+        common_sequence_char[common_char_number] = b_char[m];
         common_char_number++;
         find((l+1),(m+1));
         common_char_number--;
@@ -93,6 +94,16 @@ int main(int argc, const char * argv[]) {
               }
             }
 //--------------------first_end-----------------------
+/*            printf("%s\n",line);
+            for (j = 0;j<(number_a_char_reduce);j++){
+              printf("%c",a_char[j]);
+            }
+              printf("\n");
+            for (j = 0;j<(number_b_char_reduce);j++){
+              printf("%c",b_char[j]);
+            }
+              printf("\n");*/
+
         find(0,0);
         unsigned char n;
         for (n = 0;n<(max_common_char_number);n++){
