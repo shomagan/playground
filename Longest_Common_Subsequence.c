@@ -3,6 +3,7 @@
 #include <math.h>
   unsigned char point;
   char a_char[50];
+	unsigned char n;
   char common_sequence_char[50];
   char max_common_sequence_char[50];
   char b_char[50];
@@ -12,29 +13,49 @@
 
 static void find(unsigned char a_first_symbol,unsigned char b_first_symbol){
   unsigned char l,m;
-  if (a_first_symbol==number_a_char_reduce){
-    
-//    if (common_char_number>max_common_char_number){
-      max_common_char_number=common_char_number;
-      unsigned char n;
-      for (n = 0;n<(common_char_number);n++){
-        max_common_sequence_char[n] = common_sequence_char[n];
-        printf("%c",common_sequence_char[n]);
-      }
-        printf("\n");
-  //  }
-
-  }
-  for (l=a_first_symbol;l<number_a_char_reduce;l++){
+	if (a_first_symbol==(number_a_char_reduce)){
+ 		if (common_char_number>max_common_char_number){
+ 			max_common_char_number=common_char_number;
+ 			for (n = 0;n<(common_char_number);n++){
+   			max_common_sequence_char[n] = common_sequence_char[n];
+  //      printf("%c",common_sequence_char[n]);
+ 			}	
+    //    printf("\n");
+   	}
+ 	}
+ 	for (l=a_first_symbol;l<number_a_char_reduce;l++){
     for (m=b_first_symbol;m<number_b_char_reduce;m++){
       if (a_char[l]==b_char[m]){
-
         common_sequence_char[common_char_number] = b_char[m];
         common_char_number++;
+//        printf("%c",common_sequence_char[common_char_number]);
+/*				for (n = 0;n<(common_char_number);n++){
+     			max_common_sequence_char[n] = common_sequence_char[n];
+    	    printf("%c",common_sequence_char[n]);
+   			}	
+      	printf("\n");
+*/
         find((l+1),(m+1));
+  	 		if (common_char_number>max_common_char_number){
+    			max_common_char_number=common_char_number;
+     			for (n = 0;n<(common_char_number);n++){
+   	  			max_common_sequence_char[n] = common_sequence_char[n];
+//        printf("%c",common_sequence_char[n]);
+   				}	
+ 				}
         common_char_number--;
       }
     }
+ 		if (a_first_symbol==(number_a_char_reduce-1)){
+ 	 		if (common_char_number>max_common_char_number){
+   			max_common_char_number=common_char_number;
+   			for (n = 0;n<(common_char_number);n++){
+     			max_common_sequence_char[n] = common_sequence_char[n];
+//        printf("%c",common_sequence_char[n]);
+   			}	
+  //      printf("\n");
+    	}
+  	}
   }
 }
 
@@ -58,7 +79,7 @@ int main(int argc, const char * argv[]) {
               if (line[i]==c){
                 b_start_symbol = i+1;
               }else{
-                if ((line[i]==0x20||line[i]==0x0a||line[i]==0x00)){
+                if (line[i]==0x0a||line[i]==0x00){
                 }else{
                   if (b_start_symbol){
                     b_char[number_b_char] = line[i];
@@ -103,15 +124,13 @@ int main(int argc, const char * argv[]) {
               printf("%c",b_char[j]);
             }
               printf("\n");*/
-
         find(0,0);
         unsigned char n;
         for (n = 0;n<(max_common_char_number);n++){
           printf("%c",max_common_sequence_char[n]);
         }
-          printf("\n");
-
-        }
+				printf("\n");
+			}
 //            printf("0\n");
     }
     return 0;
@@ -139,3 +158,6 @@ int main(int argc, const char * argv[]) {
               printf("\n");
 */
   
+#include <stdio.h>
+#include <string.h>
+#include <math.h>
