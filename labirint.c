@@ -39,20 +39,11 @@ int array_separate(int array[],int size,int spawn){
       }
     }
     if(j>0){
-/*      printf("l\n");
-      for (char i = 0;i<j;i++){
-        printf("%02x;",array[i]);
-      }*/
       spawn = array_separate(&array[0],j,spawn);
 
     }
     if(j<(size-1)){
-/*      printf("h\n");
-      for (char i = 0;i<(size-j-1);i++){
-        printf("%02x;",array[j+1+i]);
-      }*/
       spawn = array_separate(&array[j+1],size-j-1,spawn);
-//      printf("spawn%02x\n",spawn);
     }
   }
   return spawn;
@@ -60,38 +51,31 @@ int array_separate(int array[],int size,int spawn){
 
 int main(int argc, const char * argv[]) {
     FILE *file = fopen(argv[1], "r");
-    int list[50];
-    char line[1024];
-    char list_len;
-    while (fgets(line, 1024, file)) {
+    uint8_t line[1336];
+    uint16_t line_len;
+    while (fgets(line, 1336, file)) {
         // Do something with the line
         char point,tab;
-        unsigned char j;
-        unsigned int i;
-        list_len = 0;
-        point = 0x2e;//"."
-        tab = 0x20;  //" "
-        int line_len = strlen(line);
+        uint16_t j,i;
+        uint8_t* p_labirint;
+        uint8_t side_width;
+        wall = 0x2a;//"*" wall
+        floor_s = 0x20;  //" " floor
+        start = 0x3b; 
+        line_len = strlen(line);
         if (line_len>1){
-          int len;
-          list[list_len++] = strtol(&line[0], NULL, 10);
-          for (i=0;list_len<=50 && i<line_len;i++){
-            if (line[i]==tab){
-              list[list_len++] = strtol(&line[i+1], NULL, 10);
+          side_width = strtol(&line[0], NULL, 10);  //get squer side widht
+          p_labirint = malloc(side_width*side_width*side_width*sizeof(char));//alloce array for labirint
+          for (i=0;i<line_len;i++){
+            
+            if (line[i]==start){
+              list[list_len++] = strtol(&line[i+1], NULL, 16);
             }
           }
           int spawn;
           spawn=0;
-/*          for (j = 0;j<list_len;j++){
-            printf("%02x;",list[j]);
-          }
-          printf("\n");*/
           spawn = array_separate(list,list_len,spawn);
-/*          for (j = 0;j<list_len;j++){
-            printf("%02x;",list[j]);
-          }*/
           printf("%i\n",spawn);
-//          printf("\n");
         }
     }
     return 0;
