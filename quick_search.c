@@ -39,20 +39,11 @@ int array_separate(int array[],int size,int spawn){
       }
     }
     if(j>0){
-/*      printf("l\n");
-      for (char i = 0;i<j;i++){
-        printf("%02x;",array[i]);
-      }*/
       spawn = array_separate(&array[0],j,spawn);
 
     }
     if(j<(size-1)){
-/*      printf("h\n");
-      for (char i = 0;i<(size-j-1);i++){
-        printf("%02x;",array[j+1+i]);
-      }*/
       spawn = array_separate(&array[j+1],size-j-1,spawn);
-//      printf("spawn%02x\n",spawn);
     }
   }
   return spawn;
@@ -64,7 +55,6 @@ int main(int argc, const char * argv[]) {
     char line[1024];
     char list_len;
     while (fgets(line, 1024, file)) {
-        // Do something with the line
         char point,tab;
         unsigned char j;
         unsigned int i;
@@ -82,16 +72,8 @@ int main(int argc, const char * argv[]) {
           }
           int spawn;
           spawn=0;
-/*          for (j = 0;j<list_len;j++){
-            printf("%02x;",list[j]);
-          }
-          printf("\n");*/
           spawn = array_separate(list,list_len,spawn);
-/*          for (j = 0;j<list_len;j++){
-            printf("%02x;",list[j]);
-          }*/
           printf("%i\n",spawn);
-//          printf("\n");
         }
     }
     return 0;
