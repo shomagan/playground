@@ -47,19 +47,19 @@ u32 calculate_node_number(char* p_labirint,u8 side_width){
     for (u16 i=0;i<item_on_layer;i++){
       u8 edge;
       u16 mod_item_number;
-      edge =0;
       mod_item_number = i % side_width;
       if(((mod_item_number==0)||((mod_item_number-1)==side_width)) ||
         ((i<side_width)||(i>=(item_on_layer-side_width)))){
         edge=1;
+      }else{
+        edge =0;
       }
       if(*(on_layer+i)==holl){
-        printf("find holl %i on layer %i /n",*(on_layer),node_number);
+        printf("find holl %i on layer %i \n",i,layer_item);
         node_number++;
       }else if ((*(on_layer+i)==floor_s) && edge){
         node_number++;
-
-        printf("find floor %i on layer %i /n",*(on_layer),node_number);
+        printf("find floor %i on layer %i \n",i,layer_item);
       }
 //      print("node number on cube %i\n",*(on_layer+i));
     }
@@ -134,10 +134,11 @@ int main(int argc, const char * argv[]) {
         id_t *node;
         uint16_t j,i,node_number;//input output and hole
         uint8_t side_width;
-//        start = 0x3b;            //";"
         line_len = strlen(line);
+        printf("line length - %i \n",line_len);
         if (line_len>1){
           side_width = strtol(&line[0], NULL, 10);  //get squer side widht
+          printf("side_width - %i ",side_width);
           p_labirint = malloc(side_width*side_width*side_width*sizeof(char));//alloce array for labirint
           for (i=0;i<line_len;i++){
             if (line[i]==start){
