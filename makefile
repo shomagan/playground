@@ -2,8 +2,8 @@ CC=gcc
 
 CFLAGS=-std=c99
 
-all: labi
+all: test_const
 
 labi:
-		$(CC) $(CFLAGS) -o labirint labirint_test.c  
+	$(CC) $(CFLAGS) -o test_const test_const.c
   

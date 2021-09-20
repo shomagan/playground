@@ -1,0 +1,1 @@
+mingw32-make.exe: Nothing to be done for 'test_const.c'.
