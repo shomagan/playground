@@ -18,21 +18,25 @@
 #include <stdio.h>
 #include <math.h>
 #include <time.h>
+#include "fb_references.h"
 #define MAX_FB_NUM 1024
 #define MAX_FB_REGISTERS 1024
-static reg_t regs_buffer[MAX_FB_NUM*MAX_FB_REGISTERS];
+#define MAX_REGISTERS (MAX_FB_NUM*MAX_FB_REGISTERS)
+static reg_t regs_buffer[MAX_REGISTERS] = {0};
+static reg_t local_regs_buffer[MAX_REGISTERS] = {0};
+
 
 static int kernel_lap(void);
 struct node {
     int ID;
     char name[32];
     struct nk_rect bounds;
-    float value;
-    struct nk_color color;
     int input_count;
+    int local_count;
     int output_count;
-    struct node *next;
-    struct node *prev;
+    u32 * input_locations;
+    u32 * local_locations;
+    u32 * output_locations;
 };
 
 struct node_link {
@@ -55,8 +59,6 @@ struct node_editor {
     int initialized;
     struct node node_buf[MAX_FB_NUM];
     struct node_link links[MAX_FB_REGISTERS*MAX_FB_NUM];
-    struct node *begin;
-    struct node *end;
     int node_count;
     int link_count;
     struct nk_rect bounds;
@@ -67,89 +69,121 @@ struct node_editor {
 };
 static struct node_editor nodeEditor;
 
-static void node_editor_push(struct node_editor *editor, struct node *node){
-    if (!editor->begin) {
-        node->next = NULL;
-        node->prev = NULL;
-        editor->begin = node;
-        editor->end = node;
-    } else {
-        node->prev = editor->end;
-        if (editor->end){
-            editor->end->next = node;
-        }
-        node->next = NULL;
-        editor->end = node;
-    }
-}
-
-static void node_editor_pop(struct node_editor *editor, struct node *node){
-    if (node->next){
-        node->next->prev = node->prev;
-    }
-    if (node->prev){
-        node->prev->next = node->next;
-    }
-    if (editor->end == node){
-        editor->end = node->prev;
-    }
-    if (editor->begin == node){
-        editor->begin = node->next;
-    }
-    node->next = NULL;
-    node->prev = NULL;
-}
-
 static struct node* node_editor_find(struct node_editor *editor, int ID){
-    struct node *iter = editor->begin;
-    while (iter) {
-        if (iter->ID == ID){
-            return iter;
+    for (int i=0;i<editor->node_count;i++){
+        if (editor->node_buf[i].ID == ID){
+            return &editor->node_buf[i];
         }
-        iter = iter->next;
     }
     return NULL;
 }
-
-static int node_editor_add(struct node_editor *editor, const char *name, struct nk_rect bounds,
-    struct nk_color col, int in_count, int out_count){
-    int id = editor->node_count;
-    struct node *node;
-    NK_ASSERT((nk_size)editor->node_count < NK_LEN(editor->node_buf));
-    node = &editor->node_buf[editor->node_count++];
-    node->ID = id;
-    node->value = 0;
-    node->color = nk_rgb(255, 0, 0);
-    node->input_count = in_count;
-    node->output_count = out_count;
-    node->color = col;
-    node->bounds = bounds;
-    strcpy(node->name, name);
-    node_editor_push(editor, node);
-    return id;
+static const fb_cals_t * get_fb_description(u32 fb_number){
+    for (u32 i=0;i<FB_NUMBER;i++){
+        if(fb_cals[i].number == fb_number){
+            return &fb_cals[i];
+        }
+    }
+    return NULL;
+}
+static u32 local_reg_number = 0;
+static u32 get_current_local_register(){
+    return local_reg_number;
+}
+static int appoint_registers(u32 regs_number,u32 * locations, reg_flag_t * flags){
+    for (u8 i=0;i<regs_number;i++){
+        if (locations[i]<MAX_REGISTERS){
+            if (regs_buffer[locations[i]].reg_flag !=0 && 
+                regs_buffer[locations[i]].reg_flag !=flags[i]){
+                printf("reg type mismatch");
+            }else{
+                regs_buffer[locations[i]].reg_flag = flags[i];
+            }
+        }else{
+            printf("lcoation error");
+        }
+    }
 }
 
-static void node_editor_link(struct node_editor *editor, int in_id, int in_slot,
-    int out_id, int out_slot){
+static int appoint_local_registers(u32 regs_number,u32 * local_locations, reg_flag_t * flags){
+    for (u8 i=0;i<regs_number;i++){
+        local_locations[i] = local_reg_number;
+        local_regs_buffer[local_reg_number].reg_flag = flags[i];
+        local_reg_number++;
+    }
+}
+static int node_editor_add(struct node_editor *editor, struct nk_rect bounds,
+    int fb_number,u32 * input_locations, u32 * output_locations){
+    fb_cals_t const * fb_cal = get_fb_description(fb_number);
+    int id = -1;
+    if(fb_cal!=NULL){
+        id = editor->node_count;
+        struct node *node;
+        NK_ASSERT((nk_size)editor->node_count < NK_LEN(editor->node_buf));
+        node = &editor->node_buf[editor->node_count];
+        editor->node_count++;
+        node->ID = id;
+        node->input_count = fb_cal->input_regs;
+        node->input_locations = malloc(fb_cal->input_regs*sizeof(u32));
+        memcpy(node->input_locations,input_locations,fb_cal->input_regs*sizeof(u32));
+        appoint_registers(node->input_count,input_locations,fb_cal->input_flags);
+        node->local_count = fb_cal->local_regs;
+        node->local_locations = malloc(fb_cal->local_regs*sizeof(u32));
+        appoint_local_registers(node->local_count,node->local_locations,fb_cal->local_flags);
+        node->output_count = fb_cal->output_regs;
+        node->output_locations = malloc(fb_cal->output_regs*sizeof(u32));
+        memcpy(node->output_locations,output_locations,fb_cal->output_regs*sizeof(u32));
+        appoint_registers(node->output_count,output_locations,fb_cal->output_flags);
+        node->bounds = bounds;
+        strncpy(node->name, fb_cal->name, 30);
+    }else{
+        printf("fb error %u",fb_number);
+    }
+    return id;
+}
+static int find_output(struct node_editor *editor,u32 location,u32 * fb_id,u32 * number){
+    for (u32 i =0;i<editor->node_count;i++){
+        for (u32 j =0;j<editor->node_buf[i].output_count;j++){
+            if(editor->node_buf[i].output_locations[j]==location){
+                *fb_id = editor->node_buf[i].ID;
+                *number = j;
+                return 1;
+            }
+        }
+    }
+    return 0;
+}
+static void node_editor_add_links(struct node_editor *editor){
     struct node_link *link;
-    NK_ASSERT((nk_size)editor->link_count < NK_LEN(editor->links));
-    link = &editor->links[editor->link_count++];
-    link->input_id = in_id;
-    link->input_slot = in_slot;
-    link->output_id = out_id;
-    link->output_slot = out_slot;
+    for (u32 i =0;i<editor->node_count;i++){
+        for (u32 j =0;j<editor->node_buf[i].input_count;j++){
+            u32 fb_id = 0;u32 number = 0;
+            if (find_output(editor,editor->node_buf[i].input_locations[j],&fb_id,&number)>0){
+                NK_ASSERT((nk_size)editor->link_count < NK_LEN(editor->links));
+                link = &editor->links[editor->link_count++];
+                link->input_id = fb_id;
+                link->input_slot = number;
+                link->output_id = editor->node_buf[i].ID;
+                link->output_slot = j;
+            }
+        }
+    }
 }
 static int time_id;
 static void node_editor_init(struct node_editor *editor){
     memset(editor, 0, sizeof(*editor));
-    editor->begin = NULL;
-    editor->end = NULL;
-    node_editor_add(editor, "Source", nk_rect(40, 10, 180, 220), nk_rgb(255, 0, 0), 0, 1);
-    node_editor_add(editor, "Source", nk_rect(40, 260, 180, 220), nk_rgb(0, 255, 0), 0, 1);
-    node_editor_add(editor, "Combine", nk_rect(400, 10, 180, 220), nk_rgb(0,0,255), 2, 2);
-    time_id = node_editor_add(editor, "time", nk_rect(400, 260, 180, 220), nk_rgb(0, 0, 0), 0, 0);
-    node_editor_link(editor, 0, 0, 2, 0);
-    node_editor_link(editor, 1, 0, 2, 1);
+    u32 locations_input[10] = {0,1,2,3};
+    u32 locations_output[10] = {4};
+    node_editor_add(editor, nk_rect(40, 10, 90, 90), 1,locations_input,locations_output);
+    locations_input[0]=5;locations_input[1]=6;locations_input[2]=7;locations_input[3]=4;
+    locations_output[0]=8;
+    node_editor_add(editor, nk_rect(40, 260, 90, 90), 2,locations_input,locations_output);
+    locations_input[0]=9;locations_input[1]=10;
+    locations_output[0]=0;
+    node_editor_add(editor, nk_rect(400, 10, 90, 90), 101,locations_input,locations_output);
+    locations_input[0]=11;locations_input[1]=12;
+    locations_output[0]=1;
+    time_id = node_editor_add(editor, nk_rect(400, 260, 90, 90),101, locations_input,locations_output);
+    node_editor_add_links(editor);
     editor->show_grid = nk_true;
 }
 
@@ -162,7 +196,6 @@ static int node_editor(struct nk_context *ctx){
     struct nk_rect total_space;
     const struct nk_input *in = &ctx->input;
     struct nk_command_buffer *canvas;
-    struct node *updated = 0;
     struct node_editor *nodedit = &nodeEditor;
 
     if (!nodeEditor.initialized) {
@@ -177,7 +210,7 @@ static int node_editor(struct nk_context *ctx){
         total_space = nk_window_get_content_region(ctx);
         nk_layout_space_begin(ctx, NK_STATIC, total_space.h, nodedit->node_count);
         {
-            struct node *it = nodedit->begin;
+            struct node *it = &nodedit->node_buf[0];
             struct nk_rect size = nk_layout_space_bounds(ctx);
             struct nk_panel *node = 0;
             if (nodedit->show_grid) {
@@ -202,7 +235,9 @@ static int node_editor(struct nk_context *ctx){
                     printf("kernel lap %i",kernel_laps);
                 }
             }
-            while (it) {
+
+            for (int i=0;i<nodedit->node_count;i++){
+                it = &nodedit->node_buf[i];            
                 /* calculate scrolled node window position and size */
                 nk_layout_space_push(ctx, nk_rect(it->bounds.x - nodedit->scrolling.x,
                     it->bounds.y - nodedit->scrolling.y, it->bounds.w, it->bounds.h));
@@ -210,19 +245,13 @@ static int node_editor(struct nk_context *ctx){
                 if (nk_group_begin(ctx, it->name, NK_WINDOW_MOVABLE|NK_WINDOW_NO_SCROLLBAR|NK_WINDOW_BORDER|NK_WINDOW_TITLE))                {
                     /* always have last selected node on top */
                     node = nk_window_get_panel(ctx);
-                    if (nk_input_mouse_clicked(in, NK_BUTTON_LEFT, node->bounds) &&
-                        (!(it->prev && nk_input_mouse_clicked(in, NK_BUTTON_LEFT,
-                        nk_layout_space_rect_to_screen(ctx, node->bounds)))) &&
-                        nodedit->end != it){
-                        updated = it;
-                    }
+
+
                     /* ================= NODE CONTENT =====================*/
                     nk_layout_row_dynamic(ctx, 25, 1);
-                    nk_button_color(ctx, it->color);
-                    it->color.r = (nk_byte)nk_propertyi(ctx, "#R:", 0, it->color.r, 255, 1,1);
-                    it->color.g = (nk_byte)nk_propertyi(ctx, "#G:", 0, it->color.g, 255, 1,1);
-                    it->color.b = (nk_byte)nk_propertyi(ctx, "#B:", 0, it->color.b, 255, 1,1);
-                    it->color.a = (nk_byte)nk_propertyi(ctx, "#A:", 0, it->color.a, 255, 1,1);
+                    int property = 0;
+                    nk_property_int(ctx, "value:", 0, &property, 100, 10, 1);
+
                     /* ====================================================*/
                     nk_group_end(ctx);
                 }
@@ -258,6 +287,7 @@ static int node_editor(struct nk_context *ctx){
                                 l1.x - 50.0f, l1.y, l1.x, l1.y, 1.0f, nk_rgb(100, 100, 100));
                         }
                     }
+
                     /* input connector */
                     space = node->bounds.h / (float)((it->input_count) + 1);
                     for (n = 0; n < it->input_count; ++n) {
@@ -266,16 +296,8 @@ static int node_editor(struct nk_context *ctx){
                         circle.y = node->bounds.y + space * (float)(n+1);
                         circle.w = 8; circle.h = 8;
                         nk_fill_circle(canvas, circle, nk_rgb(100, 100, 100));
-                        if (nk_input_is_mouse_released(in, NK_BUTTON_LEFT) &&
-                            nk_input_is_mouse_hovering_rect(in, circle) &&
-                            nodedit->linking.active && nodedit->linking.node != it) {
-                            nodedit->linking.active = nk_false;
-                            node_editor_link(nodedit, nodedit->linking.input_id,
-                                nodedit->linking.input_slot, it->ID, n);
-                        }
                     }
                 }
-                it = it->next;
             }
             /* reset linking connection */
             if (nodedit->linking.active && nk_input_is_mouse_released(in, NK_BUTTON_LEFT)) {
@@ -301,38 +323,31 @@ static int node_editor(struct nk_context *ctx){
                 nk_stroke_curve(canvas, l0.x, l0.y, l0.x + 50.0f, l0.y,
                     l1.x - 50.0f, l1.y, l1.x, l1.y, 1.0f, nk_rgb(100, 100, 100));
             }
-            if (updated) {
-                /* reshuffle nodes to have least recently selected node on top */
-                node_editor_pop(nodedit, updated);
-                node_editor_push(nodedit, updated);
-            }
             /* node selection */
             if (nk_input_mouse_clicked(in, NK_BUTTON_LEFT, nk_layout_space_bounds(ctx))) {
-                it = nodedit->begin;
+                
                 nodedit->selected = NULL;
                 nodedit->bounds = nk_rect(in->mouse.pos.x, in->mouse.pos.y, 100, 200);
-                while (it) {
+                for (int i=0;i<nodedit->node_count;i++){
+                    it = &nodedit->node_buf[i];
                     struct nk_rect b = nk_layout_space_rect_to_screen(ctx, it->bounds);
                     b.x -= nodedit->scrolling.x;
                     b.y -= nodedit->scrolling.y;
                     if (nk_input_is_mouse_hovering_rect(in, b))
                         nodedit->selected = it;
-                    it = it->next;
                 }
             }
             /* contextual menu */
             if (nk_contextual_begin(ctx, 0, nk_vec2(100, 220), nk_window_get_bounds(ctx))) {
                 const char *grid_option[] = {"Show Grid", "Hide Grid"};
                 nk_layout_row_dynamic(ctx, 25, 1);
-                if (nk_contextual_item_label(ctx, "New", NK_TEXT_CENTERED))
-                    node_editor_add(nodedit, "New", nk_rect(400, 260, 180, 220),
-                            nk_rgb(255, 255, 255), 1, 2);
                 if (nk_contextual_item_label(ctx, grid_option[nodedit->show_grid],NK_TEXT_CENTERED))
                     nodedit->show_grid = !nodedit->show_grid;
                 nk_contextual_end(ctx);
             }
         }
         nk_layout_space_end(ctx);
+
         /* window content scrolling */
         if (nk_input_is_mouse_hovering_rect(in, nk_window_get_bounds(ctx)) &&
             nk_input_is_mouse_down(in, NK_BUTTON_MIDDLE)) {
@@ -345,6 +360,5 @@ static int node_editor(struct nk_context *ctx){
 }
 static int kernel_lap(){
     struct node * time_node = node_editor_find(&nodeEditor, time_id);
-    time_node->color.a++;
     return 0;
 }

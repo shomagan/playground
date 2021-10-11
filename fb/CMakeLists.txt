@@ -19,8 +19,6 @@ file(GLOB COMMON_HEADERS  ${CMAKE_SOURCE_DIR}/*.h)
 file(GLOB FB_HEADERS  ${CMAKE_SOURCE_DIR}/fb/*.h)
 add_executable (${PRJ_NAME}.exe ${COMMON_SOURCES} ${COMMON_HEADERS} ${FB_HEADERS})
 target_link_libraries(${PRJ_NAME}.exe ${GDIPLUS_LIBRARY} ${SHLWAPI_LIBRARY})
-add_custom_command(TARGET ${PRJ_NAME}.exe POST_BUILD
-                   COMMAND ${CMAKE_COMMAND} -E copy
-                       ${CMAKE_SOURCE_DIR}/cmake_link/${PRJ_NAME}.exe ${CMAKE_SOURCE_DIR}/)
+#add_custom_command(TARGET ${PRJ_NAME}.exe POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/cmake_link/${PRJ_NAME}.exe ${CMAKE_SOURCE_DIR}/)
 
 

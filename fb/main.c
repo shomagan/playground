@@ -79,7 +79,6 @@ WindowProc(HWND wnd, UINT msg, WPARAM wparam, LPARAM lparam)
         return 0;
     return DefWindowProcW(wnd, msg, wparam, lparam);
 }
-
 int main(void)
 {
     GdipFont* font;
