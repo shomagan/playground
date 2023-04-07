@@ -36,6 +36,9 @@ typedef volatile unsigned char vu8;
 typedef volatile unsigned long int const vuc32;
 typedef volatile unsigned short const vuc16;
 typedef volatile unsigned char const vuc8;
+#ifndef size_t
+#define size_t u32
+#endif
 /**
   * @brief sofi register types
   * @ingroup regs

@@ -77,6 +77,7 @@ static struct node* node_editor_find(struct node_editor *editor, int ID){
     }
     return NULL;
 }
+#define TEST_FB_NUMBER (FB_NUMBER-1)
 static const fb_cals_t * get_fb_description(u32 fb_number){
     for (u32 i=0;i<FB_NUMBER;i++){
         if(fb_cals[i].number == fb_number){

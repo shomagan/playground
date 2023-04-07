@@ -38,8 +38,8 @@ typedef struct{
    int (*fb_init_func)(void * input,void * local,void * output);
    int (*fb_func)(void * input,void * local,void * output);
 }fb_cals_t;
-#define  FB_NUMBER  3
 extern const fb_cals_t fb_cals[];
+extern const size_t FB_NUMBER;
 /*add functions and variable declarations before */
 #ifdef __cplusplus
 }

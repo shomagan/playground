@@ -1,9 +1,9 @@
 CC=gcc
 
-CFLAGS=-std=c99
+CFLAGS=-std=gnu99
 
-all: test_const
+all: uint32_sub
 
 labi:
-	$(CC) $(CFLAGS) -o test_const test_const.c
+	$(CC) $(CFLAGS) -o uint32_sub uint32_sub.c
   

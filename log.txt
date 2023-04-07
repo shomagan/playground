@@ -1,1 +1,1 @@
-mingw32-make.exe: Nothing to be done for 'test_const.c'.
+gcc -std=gnu99    uint32_sub.c   -o uint32_sub
