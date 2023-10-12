@@ -9,7 +9,7 @@ use std::env;
       */
 fn main() {
     let args: Vec<String> = env::args().collect();
-
+    println!("rust impl");
     for arg in args.iter().skip(1) {
         let mut radix = 10;
         let value_str: &str;
@@ -38,7 +38,6 @@ fn main() {
             print!(" 0x{:X} - {}; ", byte, byte);
         }
         println!("]")
-
     }
 }
 
