@@ -1,0 +1,53 @@
+def load_status = 'did not load'
+def python_path = 'D:/_work/python/sofi_tester/venv/Scripts/python.exe'
+def script_files_path = 'D:/_work/python/sofi_tester'
+def sofi_plc_source_path = 'D:/_work/sofi_plc/free_rtos'
+
+pipeline {
+    agent any
+    stages {
+        stage('prepare') {
+            steps {
+                script{
+                    try {
+                        status_version_sofi_plc = powershell label: '', returnStdout: true, script: "${python_path} ${script_files_path}/check_plc_version_with_bins.py"
+                    } catch(error) {
+                        echo "First build failed, let's retry if accepted"
+                        retry(5) {
+                            status_version_sofi_plc = powershell label: '', returnStdout: true, script: "${python_path} ${script_files_path}/check_plc_version_with_bins.py"
+                        }
+                    }
+                }
+            }
+        }
+        stage('load') {
+            steps {
+                script{
+                    if(status_version_sofi_plc.contains('outdated')){
+                        echo "version is outdated need to load"
+                        try {
+                            echo "loading bin file"
+                            load_status = powershell label: '', returnStdout: true, script: "${python_path} ${script_files_path}/sofi_plc_loader.py"
+                        } catch(error) {
+                            echo "First build failed, let's retry if accepted"
+                            retry(5) {
+                                load_status = powershell label: '', returnStdout: true, script: "${python_path} ${script_files_path}/sofi_plc_loader.py"
+                            }
+                        }
+                    }else{
+                        echo "version is equal or higher do not need to load"
+                    }
+                }
+            }
+        }
+    }
+    post {
+        success {
+            script{
+                if (load_status.contains('success')){
+                    build job: 'sofi_plc_testing', parameters: [string(name: 'input_str_var', value: '192.168.1.232')]
+                }
+            }
+        }
+    }
+}

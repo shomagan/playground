@@ -1,0 +1,40 @@
+def plc_version = 'v0.0.0.0'
+def test_result = 'failure'
+def python_path = 'D:/_work/python/sofi_tester/venv/Scripts/python.exe'
+def script_files_path = 'D:/_work/python/sofi_tester'
+def sofi_plc_source_path = 'D:/_work/sofi_plc/free_rtos'
+
+pipeline {
+    agent any
+    stages {
+        stage('testing') {
+            steps {
+                script{
+                    try {
+                        plc_version = powershell label: '', returnStdout: true, script: "${python_path} ${script_files_path}/get_version_from_controller.py"
+                    } catch(error) {
+                        echo "get_version_from_controller failed"
+                        retry(5) {
+                            plc_version = powershell label: '', returnStdout: true, script: "${python_path} ${script_files_path}/get_version_from_controller.py"
+                        }
+                    }
+                }
+
+                script{
+                    try {
+                        test_result = powershell label: '', returnStdout: true, script: "${python_path} ${script_files_path}/plc_testing.py"
+                    } catch(error) {
+                        echo "testing failed"
+                        retry(5) {
+                            test_result = powershell label: '', returnStdout: true, script: "${python_path} ${script_files_path}/plc_testing.py"
+                        }
+                    }
+                    if (test_result.contains('success')){
+                    }else{
+                        currentBuild.result = 'FAILURE'
+                    }
+                }
+            }
+        }
+    }
+}

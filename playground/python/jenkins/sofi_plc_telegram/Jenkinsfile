@@ -1,0 +1,41 @@
+handling_result = 'none'
+def python_path = 'D:/_work/python/sofi_tester/venv/Scripts/python.exe'
+def script_files_path = 'D:/_work/python/sofi_tester'
+def sofi_plc_source_path = 'D:/_work/sofi_plc/free_rtos'
+
+pipeline {
+    agent any
+    stages {
+        stage('get message') {
+            steps {
+                script{
+                    try {
+                        handling_result = powershell label: '', returnStdout: true, script: "${python_path} ${script_files_path}/telegram_handling.py"
+                    } catch(error) {
+                        echo "telegram_handling failed"
+                        retry(5) {
+                            handling_result = powershell label: '', returnStdout: true, script: "${python_path} ${script_files_path}/telegram_handling.py"
+                        }
+                    }
+                }
+            }
+        }
+        stage('start program') {
+            steps {
+                script{
+                    script{
+                        if (handling_result.contains('test')){
+                            build job: 'sofi_plc_testing', parameters: [string(name: 'input_str_var', value: '192.168.1.232')]
+                        }
+                        if (handling_result.contains('build')){
+                            build job: 'sofi_plc_building', parameters: [string(name: 'input_str_var', value: '192.168.1.232')]
+                        }
+                        if (handling_result.contains('load')){
+                            build job: 'sofi_plc_loading', parameters: [string(name: 'input_str_var', value: '192.168.1.232')]
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

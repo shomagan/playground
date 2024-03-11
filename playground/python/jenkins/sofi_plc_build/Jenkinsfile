@@ -1,0 +1,92 @@
+def status_version_sofi_plc = 'the_same'
+def version_sofi_plc = 'v0.0.0.0'
+def status_version_canfestival = 'the_same'
+def status_version_generators = 'the_same'
+def need_to_build = 'no'
+def bin_file_status = 'file_not_exist'
+def python_path = 'D:/_work/python/sofi_tester/venv/Scripts/python.exe'
+def script_files_path = 'D:/_work/python/sofi_tester'
+def sofi_plc_source_path = 'D:/_work/sofi_plc/free_rtos'
+pipeline {
+    agent any
+    stages {
+        stage('prepare') {
+            steps {
+                script{
+                    status_version_sofi_plc = powershell label: '', returnStdout: true, script: "${python_path} ${script_files_path}/check_version_sofi_plc.py"
+                }
+                script{
+                    status_version_canfestival = powershell label: '', returnStdout: true, script: "${python_path} ${script_files_path}/check_version_canfestival.py"
+                }
+                script{
+                    status_version_generators = powershell label: '', returnStdout: true, script: "${python_path} ${script_files_path}/check_version_generators.py"
+                }
+                script{
+                    version_sofi_plc = powershell label: '', returnStdout: true, script: "${python_path} ${script_files_path}/get_version_sofi_plc.py"
+                }
+                script{
+                    if (status_version_sofi_plc.contains('changed') || status_version_canfestival.contains('changed') || status_version_generators.contains('changed')){
+                        need_to_build = 'yes'
+                        echo "have changes: sofi_plc - ${status_version_sofi_plc}, canfestival - ${status_version_canfestival}, generators - ${status_version_generators}"
+                    }else{
+                        echo 'have the same version'
+                    }
+                    bin_file_status = powershell label: '', returnStdout: true, script: "${python_path} ${script_files_path}/compare_version_sofi_plc_with_bin.py -v ${version_sofi_plc}"
+                    if (bin_file_status != 'file_exist'){
+                        need_to_build = 'yes'
+                        echo 'bin file not exist'
+                    }
+                }
+            }
+        }
+        stage('pull') {
+            steps {
+                script{
+                    if(status_version_generators.contains('changed')){
+                        powershell("${python_path} ${script_files_path}/pull_generators.py")
+                    }
+                    if(status_version_canfestival.contains('changed')){
+                        powershell("${python_path} ${script_files_path}/pull_canfestival.py")
+                    }
+                    if(status_version_sofi_plc.contains('changed')){
+                        powershell("${python_path} ${script_files_path}/pull_sofi_plc.py")
+                    }
+                }
+            }
+        }
+        stage('build') {
+            steps {
+                script{
+                    if (need_to_build == 'yes'){
+                        echo 'need to build'
+                        script{
+                            powershell("${python_path} ${script_files_path}/change_regsh.py")
+                        }
+                        powershell("cmake -S ${sofi_plc_source_path} -B ${sofi_plc_source_path}/cmake_arm -G \"MinGW Makefiles\" -DCMAKE_SH=\"CMAKE_SH-NOTFOUND\"")
+                        powershell("cmake --build ${sofi_plc_source_path}/cmake_arm --target all")
+                        script{
+                            bin_file_status = powershell label: '', returnStdout: true, script: "${python_path} ${script_files_path}/compare_version_sofi_plc_with_bin.py -v ${version_sofi_plc}"
+                            if (bin_file_status.contains('file_exist')){
+                                echo 'bin file exist'
+                            }else{
+                                echo 'bin file not exist'
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    post {
+        success {
+            script{
+                if (need_to_build == 'yes'){
+                    echo 'loading'
+                    if (bin_file_status.contains('files_exist')){
+                        build job: 'sofi_plc_loading', parameters: [string(name: 'input_str_var', value: '192.168.1.232')]
+                    }
+                }
+            }
+        }
+    }
+}
