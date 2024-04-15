@@ -26,24 +26,30 @@ except ImportError:
 
 async def main():
     bot = telegram.Bot(credentials.tel_bot_api)
-    latitude, longitude, timestamps = get_tracker_data(credentials.DEV_EUI_3)
+    latitude, longitude, timestamps, battery_percent = get_tracker_data(credentials.DEV_EUI_3)
     if latitude:
         create_map("tracker_3", latitude, longitude, timestamps)
         file_to_send = open("tracker_3.html", "rb")
+        await bot.send_message(credentials.tel_home_id,
+                               f"got new locations for tracker 3, battery - {battery_percent}")
         await bot.send_document(credentials.tel_home_id, file_to_send)
         file_to_send.close()
     else:
-        await bot.send_message(credentials.tel_home_id, "there is no locations update for tracker 3")
-        logging.info(f"there is no locations update for tracker 3")
-    latitude, longitude, timestamps = get_tracker_data(credentials.DEV_EUI_2)
+        await bot.send_message(credentials.tel_home_id,
+                               f"there is no locations update for tracker 3, battery - {battery_percent}")
+        logging.info(f"there is no locations update for tracker 3, battery - {battery_percent}")
+    latitude, longitude, timestamps, battery_percent = get_tracker_data(credentials.DEV_EUI_2)
     if latitude:
         create_map("tracker_2", latitude, longitude, timestamps)
         file_to_send = open("tracker_2.html", "rb")
+        await bot.send_message(credentials.tel_home_id,
+                               f"got new locations for tracker 2, battery - {battery_percent}")
         await bot.send_document(credentials.tel_home_id, file_to_send)
         file_to_send.close()
     else:
-        await bot.send_message(credentials.tel_home_id, "there is no locations update for tracker 2")
-        logging.info(f"there is not locations in time for tracker 2")
+        await bot.send_message(credentials.tel_home_id,
+                               f"there is no locations update for tracker 2, battery - {battery_percent}")
+        logging.info(f"there is not locations in time for tracker 2 , battery - {battery_percent}")
     return
 
 
@@ -71,6 +77,7 @@ def get_tracker_data(dev_eui):
     latitude = []
     longitude = []
     timestamps = []
+    battery_percent = 0.0
     if "metrics" in r.json():
         metrics = r.json()["metrics"]
         for i in range(len(metrics['latitude']['timestamps'])):
@@ -80,13 +87,18 @@ def get_tracker_data(dev_eui):
                 longitude.append(metrics['longitude']['datasets'][0]['data'][i])
                 timestamps.append(metrics['latitude']['timestamps'][i])
         logging.debug(f"latitudes - {latitude}")
+        for battery in (metrics['battery']['datasets'][0]['data']):
+            if float(battery) > 0.1:
+                battery_percent = float(battery)
+
+
     else:
         logging.error(f"no key metrics , incorrect answer")
-    return latitude, longitude, timestamps
+    return latitude, longitude, timestamps, battery_percent
 
 
 if __name__ == "__main__":
-    logging.basicConfig(level="INFO")
+    logging.basicConfig(level="DEBUG")
     logging.info(__description__)
     asyncio.run(main())
 
