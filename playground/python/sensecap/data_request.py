@@ -98,7 +98,7 @@ def get_tracker_data(dev_eui):
 
 
 if __name__ == "__main__":
-    logging.basicConfig(level="DEBUG")
+    logging.basicConfig(level="INFO")
     logging.info(__description__)
     asyncio.run(main())
 
