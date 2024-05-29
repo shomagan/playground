@@ -38,6 +38,7 @@ async def main():
         await bot.send_message(credentials.tel_home_id,
                                f"there is no locations update for tracker 3, battery - {battery_percent}")
         logging.info(f"there is no locations update for tracker 3, battery - {battery_percent}")
+
     latitude, longitude, timestamps, battery_percent = get_tracker_data(credentials.DEV_EUI_2)
     if latitude:
         create_map("tracker_2", latitude, longitude, timestamps)
@@ -50,6 +51,20 @@ async def main():
         await bot.send_message(credentials.tel_home_id,
                                f"there is no locations update for tracker 2, battery - {battery_percent}")
         logging.info(f"there is not locations in time for tracker 2 , battery - {battery_percent}")
+
+    latitude, longitude, timestamps, battery_percent = get_tracker_data(credentials.DEV_EUI_CAR)
+    if latitude:
+        create_map("tracker_car", latitude, longitude, timestamps)
+        file_to_send = open("tracker_car.html", "rb")
+        await bot.send_message(credentials.tel_home_id,
+                               f"got new locations for car, battery - {battery_percent}")
+        await bot.send_document(credentials.tel_home_id, file_to_send)
+        file_to_send.close()
+    else:
+        await bot.send_message(credentials.tel_home_id,
+                               f"there is no locations update for tracker car, battery - {battery_percent}")
+        logging.info(f"there is not locations in time for tracker car , battery - {battery_percent}")
+
     return
 
 
@@ -61,7 +76,7 @@ def create_map(dev_name, latitudes, longitudes, timestamps):
 
 
 def get_tracker_data(dev_eui):
-    delta_time = timedelta(days=2)
+    delta_time = timedelta(days=1)
     now = datetime.now()
     end_time = now.strftime("%Y-%m-%dT%H:%M:%S.000Z")
     # Print the local time from a week ago
@@ -90,15 +105,13 @@ def get_tracker_data(dev_eui):
         for battery in (metrics['battery']['datasets'][0]['data']):
             if float(battery) > 0.1:
                 battery_percent = float(battery)
-
-
     else:
         logging.error(f"no key metrics , incorrect answer")
     return latitude, longitude, timestamps, battery_percent
 
 
 if __name__ == "__main__":
-    logging.basicConfig(level="INFO")
+    logging.basicConfig(level="DEBUG")
     logging.info(__description__)
     asyncio.run(main())
 

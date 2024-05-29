@@ -12,7 +12,11 @@ function decodeUplink(input) {
     const fport = parseInt(input['fPort'])
 
     const packetID = bytes[0];
-    var decoded = {};
+    var decoded = {
+        valid: true,
+        err: 0,
+        messages: []
+    };
 
 
     if (packetID == 1) {
@@ -41,7 +45,7 @@ function decodeUplink(input) {
         const tr = bytes[36];
         const le = Boolean(bytes[37]);
         const lu = bytes[38] << 8 | bytes[39];
-        const ls = bytes[40] << 8 | by  tes[41];
+        const ls = bytes[40] << 8 | bytes[41];
         const lh = bytes[42] << 8 | bytes[43];
         const ll = bytes[44] << 8 | bytes[45];
         const lw = bytes[46];
@@ -64,7 +68,6 @@ function decodeUplink(input) {
 
         decoded = {
             packet: "Heartbeat",
-            packet_data_str: bytes.toString(),
             battery: batt,
             softwareV: swv,
             hardwareV: hwv,
@@ -124,7 +127,6 @@ function decodeUplink(input) {
 
         decoded = {
             packet: "Heartbeat",
-            packet_data_str: bytes.toString(),
             battery: batt,
             softwareV: swv,
             hardwareV: hwv,
@@ -151,7 +153,6 @@ function decodeUplink(input) {
 
         decoded = {
             packet: "Heartbeat",
-            packet_data_str: bytes.toString(),
             battery: batt,
             workMode: wm,
             posStrategy: ps,
@@ -160,7 +161,7 @@ function decodeUplink(input) {
     } else if (packetID == 6) {
         const sta = (bytes[1] << 16 | bytes[2] << 8 | bytes[3]);
         const mcnt = bytes[4];
-        const utc = unixToDateTime(bytes[5] << 24 | bytes[6] << 16 | bytes[7] << 8 | bytes[8]);
+        const utc = (bytes[5] << 24 | bytes[6] << 16 | bytes[7] << 8 | bytes[8]);
         const lon = (bytes[9] << 24 | bytes[10] << 16 | bytes[11] << 8 | bytes[12]) / 1000000;
         const lat = (bytes[13] << 24 | bytes[14] << 16 | bytes[15] << 8 | bytes[16]) / 1000000;
         const tmp = ((bytes[17] & 0x80 ? 0xFFFF << 16 : 0) | bytes[17] << 8 | bytes[18]) / 10;
@@ -169,7 +170,6 @@ function decodeUplink(input) {
 
         decoded = {
             packet: "GNSS Location & Sensor Data",
-            packet_data_str: bytes.toString(),
             eventStatus: sta,
             motionCount: mcnt,
             utcTime: utc,
@@ -183,20 +183,18 @@ function decodeUplink(input) {
         const utc = unixToDateTime(bytes[8] << 24 | bytes[9] << 16 | bytes[10] << 8 | bytes[11]);
         decoded = {
             packet: "hz 7",
-            packet_data_str: bytes.toString(),
-            utcTime: utc,
+            utcTime: utc
         }
     } else if (packetID == 9) {
         const sta = (bytes[1] << 16 | bytes[2] << 8 | bytes[3]);
         const mcnt = bytes[4];
-        const utc = unixToDateTime(bytes[5] << 24 | bytes[6] << 16 | bytes[7] << 8 | bytes[8]);
+        const utc = (bytes[5] << 24 | bytes[6] << 16 | bytes[7] << 8 | bytes[8]);
         const lon = (bytes[9] << 24 | bytes[10] << 16 | bytes[11] << 8 | bytes[12]) / 1000000;
         const lat = (bytes[13] << 24 | bytes[14] << 16 | bytes[15] << 8 | bytes[16]) / 1000000;
         const batt = bytes[17];
 
         decoded = {
             packet: "GNSS Location",
-            packet_data_str: bytes.toString(),
             eventStatus: sta,
             motionCount: mcnt,
             utcTime: utc,
@@ -215,7 +213,6 @@ function decodeUplink(input) {
 
             decoded = {
                 packet: "Positing status",
-                packet_data_str: bytes.toString(),
                 utcTime: utc,
                 temperature: tmp,
                 light: lgt,
@@ -224,7 +221,6 @@ function decodeUplink(input) {
         } else {
             decoded = {
                 packet: "Positing status",
-                packet_data_str: bytes.toString(),
                 utcTime: utc,
                 battery: batt
             }
@@ -237,7 +233,6 @@ function decodeUplink(input) {
 
         decoded = {
             packet: "Positioning Timeout",
-            packet_data_str: bytes.toString(),
             longitude: 0,
             latitude: 0,
             errorCode: ec
