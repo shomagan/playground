@@ -1,27 +1,79 @@
-#include <stdio.h>
-#include <string.h>
-#include <math.h>
-#include <iostream>   
-static int merge_sort(int* test_array, int test_array_size);
-int array_to_sort[] = {3,1,5,0,13,10999,98779,-33,88,99,1000};
-int main(int argc, const char * argv[]) {
-   int array_size = sizeof(array_to_sort)/sizeof(int);
-   for (int i =0;i < array_size;i++){
-      printf("%i,"array_to_sort[i]);
-   }
-   printf("\n");
 
-   merge_sort(array_to_sort, array_size);
-   for (int i =0;i < array_size;i++){
-      printf("%i,"array_to_sort[i]);
-   }
-   return 0;
+/* Iterative C program for merge sort */
+#include<stdlib.h>
+#include<stdio.h>
+ 
+/* Function to merge the two haves arr[l..m] and arr[m+1..r] of array arr[] */
+static void merge(int arr[], int l, int m, int r);
+static void mergeSort(int arr[], int n);
+static void printArray(int A[], int size);
+
+int min(int x, int y) { return (x<y)? x :y; }
+
+int main(int argc, const char * argv[]) {
+    int arr[] = {12, 11, 13, 5, 6, 7, 33,-4,1000,0};
+    int n = sizeof(arr)/sizeof(arr[0]);
+    printf("Given array is \n");
+    printArray(arr, n);
+    mergeSort(arr, n);
+    printf("\nSorted array is \n");
+    printArray(arr, n);
+    return 0;
 }
 
-static int merge_sort(int* test_array, int test_array_size){
-    int result = 0;
-    for (int i= 0;i<){
-        if (test_array[i + 1] < test_array[i])  
+/* Iterative mergesort function to sort arr[0...n-1] */
+static void mergeSort(int arr[], int n){
+   int curr_size;  
+   int left_start; 
+   for (curr_size=1; curr_size<n; curr_size = 2*curr_size){
+       for (left_start=0; left_start<n-1; left_start += 2*curr_size) {
+           int mid = min(left_start + curr_size - 1, n-1);
+           int right_end = min(left_start + 2*curr_size - 1, n-1);
+           merge(arr, left_start, mid, right_end);
+       }
+   }
+}
+ 
+/* Function to merge the two haves arr[l..m] and arr[m+1..r] of array arr[] */
+static void merge(int arr[], int l, int m, int r){
+    int i, j, k;
+    int n1 = m - l + 1;
+    int n2 =  r - m;
+    int L[n1], R[n2];
+    for (i = 0; i < n1; i++){
+        L[i] = arr[l + i];
     }
-    return result;
+    for (j = 0; j < n2; j++){
+        R[j] = arr[m + 1+ j];
+    }
+    i = 0;
+    j = 0;
+    k = l;
+    while (i < n1 && j < n2){
+        if (L[i] <= R[j]){
+            arr[k] = L[i];
+            i++;
+        }else{
+            arr[k] = R[j];
+            j++;
+        }
+        k++;
+    }
+    while (i < n1){
+        arr[k] = L[i];
+        i++;
+        k++;
+    }
+    while (j < n2){
+        arr[k] = R[j];
+        j++;
+        k++;
+    }
+}
+void printArray(int A[], int size){
+    int i;
+    for (i=0; i < size; i++){
+        printf("%d ", A[i]);
+    }
+    printf("\n");
 }
