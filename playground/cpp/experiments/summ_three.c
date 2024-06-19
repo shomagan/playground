@@ -7,38 +7,31 @@ int test_array[] = {82597,-9243,62390,83030,-97960,-26521,-61011,83390,-38677,12
 int min(int x, int y) { return (x<y)? x :y; }
 static void merge(int arr[], int l, int m, int r);
 static void mergeSort(int arr[], int n);
+static int binary_search(int* test_array, int test_array_size,int value);
 
 int main(int argc, const char * argv[]) {
    int ** result = malloc(sizeof(int*)*ALLOC_SIZE);
    int return_size = 0;
    int *returnSize = &return_size; 
    const int array_size = sizeof(test_array)/sizeof(int);
-   printf("array_sizel %i",array_size);
+   printf("array_size %i",array_size);
    mergeSort(test_array, array_size);
-
    for (int i = 0; i<array_size-2; i++){
-      if(i!=0 && test_array[i] != test_array[i-1]){
+      if(i==0 || test_array[i] != test_array[i-1]){
          int a = 0 - test_array[i];
          for(int j=i+1; j<array_size; j++){
-            if(j!=i+1 && test_array[j] != test_array[j-1]){
-
+            if(j==i+1 || test_array[j] != test_array[j-1]){
                int b = a - test_array[j];
-               for(int k = j+1; k < array_size;k++){
-                   if(k!=j+1 && test_array[k] != test_array[k-1]){
-                      if(b == test_array[k]){
-                          int * temp_result = malloc(sizeof(int)*3);
-                          temp_result[0] = test_array[i];
-                          temp_result[1] = test_array[j];
-                          temp_result[2] = test_array[k];
-                          result[return_size] = temp_result;
-                          return_size++;
-                          if (return_size % ALLOC_SIZE==0){
-                             result = realloc(result, sizeof(int*)*(return_size/ALLOC_SIZE+1)*ALLOC_SIZE);
-                             printf("(return_size/ALLOC_SIZE+1)*ALLOC_SIZE %i",(return_size/ALLOC_SIZE+1)*ALLOC_SIZE);
-
-                          }
-
-                      }
+               int k = binary_search(&test_array[j+1], array_size-j-1,b);
+               if(k != array_size-j-1){
+                   int * temp_result = malloc(sizeof(int)*3);
+                   temp_result[0] = test_array[i];
+                   temp_result[1] = test_array[j];
+                   temp_result[2] = test_array[k+j+1];
+                   result[return_size] = temp_result;
+                   return_size++;
+                   if (return_size % ALLOC_SIZE==0){
+                      result = realloc(result, sizeof(int*)*(return_size/ALLOC_SIZE+1)*ALLOC_SIZE);
                    }
                }
             }
@@ -98,4 +91,37 @@ static void merge(int arr[], int l, int m, int r){
         j++;
         k++;
     }
+}
+static int binary_search(int* test_array, int test_array_size,int value){
+   int result = test_array_size;
+   int left_element = 0;
+   int right_element = test_array_size-1;
+   int current_element = left_element + (right_element-left_element)/2; 
+   for(int i =1;test_array_size>=i;i<<1){
+      if (test_array[current_element]==value){
+         result = current_element;
+         break;
+      }else if (test_array[current_element]>value){
+         if(current_element <= left_element){
+            break;
+         }else{
+            right_element = current_element;
+         }
+         
+      }else if (test_array[current_element]<value){
+         if(current_element >= right_element){
+            break;
+         }else{
+            left_element = current_element;
+            if ((right_element-left_element)==1){
+               if (test_array[right_element]==value){
+                  result = right_element;
+               }
+               break;
+            }
+         }
+      }
+      current_element = left_element + (right_element-left_element)/2;
+   };
+   return result;
 }

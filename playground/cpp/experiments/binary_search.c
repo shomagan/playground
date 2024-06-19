@@ -54,7 +54,7 @@ static int binary_search(int* test_array, int test_array_size,int value){
    int left_element = 0;
    int right_element = test_array_size-1;
    int current_element = left_element + (right_element-left_element)/2; 
-   for(int i =1;test_array_size>i;i<<1){
+   for(int i =1;test_array_size>=i;i<<1){
       if (test_array[current_element]==value){
          result = current_element;
          break;
