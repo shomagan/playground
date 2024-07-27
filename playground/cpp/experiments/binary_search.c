@@ -52,33 +52,18 @@ int main(int argc, const char * argv[]) {
 static int binary_search(int* test_array, int test_array_size,int value){
    int result = test_array_size;
    int left_element = 0;
-   int right_element = test_array_size-1;
-   int current_element = left_element + (right_element-left_element)/2; 
-   for(int i =1;test_array_size>=i;i<<1){
+   int right_element = test_array_size;
+   int current_element = (left_element + right_element)/2; 
+   while(left_element <= right_element){
       if (test_array[current_element]==value){
          result = current_element;
          break;
       }else if (test_array[current_element]>value){
-         if(current_element <= left_element){
-            break;
-         }else{
-            right_element = current_element;
-         }
-         
+         right_element = current_element-1;
       }else if (test_array[current_element]<value){
-         if(current_element >= right_element){
-            break;
-         }else{
-            left_element = current_element;
-            if ((right_element-left_element)==1){
-               if (test_array[right_element]==value){
-                  result = right_element;
-               }
-               break;
-            }
-         }
+         left_element = current_element+1;
       }
-      current_element = left_element + (right_element-left_element)/2;
+      current_element = (left_element + right_element)/2;
    };
    return result;
 }
