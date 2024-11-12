@@ -1,0 +1,25 @@
+{
+  "devices":[{
+    "mdb_address" :4,
+    "device_name" :"morse",
+    "spaces":[{ 
+      "var_name" :"morse_unit_time_ms",
+      "function"  :"write",
+      "value" :130
+      },
+      { 
+      "var_name" :"morse_unit_time_ms",
+      "function"  :"write",
+      "value" :130
+    }
+    ]
+  },
+  { 
+    "mdb_address" :5,
+    "device_name" :"iirls",
+    "spaces":[{ "var_name" :"check_point",
+      "function"  :"read",
+      "value" :0}
+    ]
+  }]
+}
