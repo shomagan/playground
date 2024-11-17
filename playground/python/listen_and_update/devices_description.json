@@ -16,10 +16,19 @@
   },
   { 
     "mdb_address" :5,
-    "device_name" :"iirls",
-    "spaces":[{ "var_name" :"check_point",
+    "device_name" :"morse",
+    "spaces":[{ "var_name" :"reset_num",
       "function"  :"read",
-      "value" :0}
+      "interval_sec"  :300,
+      "value" :0},
+      { "var_name" :"sys_tick_counter",
+      "function"  :"read",
+      "interval_sec"  :90,
+      "value" :0},
+      { "var_name" :"fw_version",
+      "function"  :"read",
+      "interval_sec"  :500,
+      "value" :0}       
     ]
   }]
 }
