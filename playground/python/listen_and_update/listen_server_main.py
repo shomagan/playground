@@ -97,7 +97,7 @@ def udp_list(description_queue):
                 logging.debug(f"Address: {address}, Packet number: {packet_number}")
                 logging.debug(f"Data: {data}, Length: {len(data)}")
                 data = data.decode(errors="ignore")
-                data = data[:data.rfind('}')+1]
+                data = data[:data.find('}')+1]
                 logging.debug(f"Data reduced: {data}, Length: {len(data)}")
                 data_json = json.loads(data)
                 if "device_name" in data_json:
