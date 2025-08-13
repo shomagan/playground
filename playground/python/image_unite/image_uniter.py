@@ -37,15 +37,15 @@ def main():
     for (dirpath, dirnames, filenames) in walk(options.directory):
         for file_name in filenames:
             try:
-                image_data = Image.open(options.directory + "/" + file_name)
+                image_data = Image.open(f"{dirpath}/{file_name}")
                 w, h = image_data.size
                 if w > h:
-                    logging.info(f"{options.directory}/{file_name} - horizontal {w} {h}")
+                    logging.info(f"{dirpath}/{file_name} - horizontal {w} {h}")
                 else:
-                    logging.info(f"{options.directory}/{file_name} - vertical {w} {h}")
+                    logging.info(f"{dirpath}/{file_name} - vertical {w} {h}")
                     image_data = image_data.rotate(90, expand=True)
                     w, h = image_data.size
-                    logging.debug(f"{options.directory}/{file_name} after rotating {w} {h}")
+                    logging.debug(f"{dirpath}/{file_name} after rotating {w} {h}")
 
                 coefficient = calculate_coefficient(w, h, (options.width - (brim * (max_row - 1))) / max_row,
                                               (options.height-(brim*(max_row-1))) / max_line)
