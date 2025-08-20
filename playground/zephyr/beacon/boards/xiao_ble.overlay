@@ -1,3 +1,14 @@
+/* Use the single port interrupt with the sense mechanism for all gpio pin interrupts */
+
+&i2c0 {
+	status = "okay";
+};
+
+&gpio0 {
+	status = "okay";
+	sense-edge-mask = < 0xffffffff >;
+};
+
 &uart0 {
     status = "disabled";
 };
@@ -11,14 +22,6 @@
 };
 
 &spi1 {
-    status = "disabled";
-};
-
-&i2c0 {
-    status = "disabled";
-};
-
-&i2c1 {
     status = "disabled";
 };
 
@@ -37,3 +40,4 @@
 &qspi {
 	status = "disabled";
 };
+
