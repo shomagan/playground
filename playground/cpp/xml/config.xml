@@ -1,0 +1,41 @@
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ xsi:noNamespaceSchemaLocation="config.xsd">
+    <host></host>
+    <guest name="guest1">
+        <interface>eth0</interface>
+    </guest>
+    <guest name="guest2">
+        <interface>eth1</interface>
+    </guest>
+    <firewall>
+        <!-- Firewall rules in network -->
+        <interface name="emac0">
+            <vlan name="vlan0">
+                <!-- Traffic to be passed through with PCP control based on L2 rules -->
+                <vlan id="20" pcp="6" />
+                <vlan id="25" pcp="1" />
+                <vlan id="32" pcp="2" />
+                <server_ip>192.168.2.1</server_ip>
+            </vlan>
+            <vlan name="vlan1">
+                <!-- Traffic to be passed through with PCP control based on L2 rules -->
+                <vlan id="20" pcp="6" />
+                <server_ip>192.168.1.1</server_ip>
+            </vlan>        
+        </interface>
+        <interface name="emac1">
+            <vlan name="vlan2">
+                <!-- Traffic to be passed through with PCP control based on L2 rules -->
+                <vlan id="20" pcp="6" />
+                <vlan id="25" pcp="1" />
+                <vlan id="32" pcp="2" />
+                <server_ip>192.168.2.1</server_ip>
+            </vlan>
+            <vlan name="vlan3">
+                <!-- Traffic to be passed through with PCP control based on L2 rules -->
+                <vlan id="20" pcp="6" />
+                <server_ip>192.168.1.1</server_ip>
+            </vlan>        
+        </interface>
+    </firewall>
+</config>
