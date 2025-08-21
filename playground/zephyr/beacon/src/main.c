@@ -14,6 +14,8 @@
 #include <zephyr/bluetooth/bluetooth.h>
 #include <zephyr/bluetooth/hci.h>
 #include <zephyr/drivers/sensor.h>
+#include "battery/battery.h"
+
 
 #define DEVICE_NAME CONFIG_BT_DEVICE_NAME
 #define DEVICE_NAME_LEN (sizeof(DEVICE_NAME) - 1)
@@ -24,11 +26,11 @@ uint32_t heart_bit = 0;
  * https://github.com/google/eddystone/tree/master/eddystone-url
  */
 uint8_t tlm_data[] = {
-	0xaa, 0xfe, /* Eddystone UUID */
-	0x20, /* tlm */
-	0x00, /* version */
-	0x00, 0x00, /* vbat */
-	0x00, 0x00, /* temp */
+	0xaa, 0xfe, /* 0,1 Eddystone UUID */
+	0x20, /* 2 tlm */
+	0x00, /* 3 version */
+	0x00, 0x00, /* 4,5 vbat */
+	0x00, 0x00, /* 6,7 temp */
 	0x00, 0x00, 0x00, 0x00, /* heart bit */
 	0x00, 0x00, 0x00, 0x00  /* time sync */
 };
@@ -73,7 +75,7 @@ int main(void)
 {
 	int err;
 	struct sensor_value odr_attr;
-
+	int ret;
 
 	printk("Starting Beacon Demo\n");
 	/* Put the flash into deep power down mode
@@ -106,6 +108,12 @@ int main(void)
 	if (err) {
 		printk("Bluetooth init failed (err %d)\n", err);
 	}
+	ret = battery_init();
+	if (ret)	{
+		printk("Failed to initialize battery management (error %d)", ret);
+		return ret;
+	}
+
 	do{
 		k_msleep(1000);
 		if (accel && device_is_ready(accel)) {
@@ -113,15 +121,19 @@ int main(void)
 
 			if (sensor_sample_fetch_chan(accel, SENSOR_CHAN_ACCEL_XYZ) == 0 &&
 				sensor_channel_get(accel, SENSOR_CHAN_ACCEL_XYZ, xyz) == 0) {
-			/* xyz[0]=X, xyz[1]=Y, xyz[2]=Z in m/s^2 (val1 + val2/1e6) */
-				tlm_data[4] = (xyz[0].val1 >> 8) & 0xFF;
-				tlm_data[5] = (xyz[1].val1 >> 8) & 0xFF;
-				tlm_data[6] = (xyz[2].val1 >> 8) & 0xFF;
-			// Example: printk("acc: %d.%06d %d.%06d %d.%06d m/s^2\n",
-			// 	xyz[0].val1, xyz[0].val2,
-			// 	xyz[1].val1, xyz[1].val2,
-			// 	xyz[2].val1, xyz[2].val2);
+				tlm_data[6] = (xyz[0].val1 >> 8) & 0xFF;
+				tlm_data[7] = (xyz[2].val1 >> 8) & 0xFF;
 			}
+		}
+
+
+		uint16_t voltage;
+
+		int ret = battery_get_millivolt(&voltage);
+		if (ret == 0) {
+		// Use the voltage value here
+			tlm_data[4] = (voltage >> 8) & 0xFF;
+			tlm_data[5] = voltage & 0xFF;
 		}
 		/*update advertisement tlm data*/
 		tlm_data[8] = (heart_bit >> 24) & 0xFF;
