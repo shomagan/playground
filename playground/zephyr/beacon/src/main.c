@@ -19,6 +19,12 @@
 
 #define DEVICE_NAME CONFIG_BT_DEVICE_NAME
 #define DEVICE_NAME_LEN (sizeof(DEVICE_NAME) - 1)
+#define BT_GAP_PER_ADV_SLOW_INT_MIN_CP 0x05dc /*1500*/
+#define BT_GAP_PER_ADV_SLOW_INT_MAX_CP 0x06d6 /*1750*/
+#define BT_LE_ADV_NCONN_CP BT_LE_ADV_PARAM(0, BT_GAP_PER_ADV_SLOW_INT_MIN_CP, \
+		BT_GAP_PER_ADV_SLOW_INT_MAX_CP, NULL)
+#define BATT_MEASUREMENT_INTERVAL_MS 30000
+
 uint32_t heart_bit = 0;
 /*
  * Set Advertisement data. Based on the Eddystone specification:
@@ -53,11 +59,7 @@ static const struct bt_data ad[] = {
 static const struct bt_data sd[] = {
 	BT_DATA(BT_DATA_NAME_COMPLETE, DEVICE_NAME, DEVICE_NAME_LEN),
 };
-#define BT_GAP_PER_ADV_SLOW_INT_MIN             0x0320  /* 1 s      */
-#define BT_GAP_PER_ADV_SLOW_INT_MAX             0x03C0  /* 1.2 s    */
 
-#define BT_LE_ADV_NCONN_CP BT_LE_ADV_PARAM(0, BT_GAP_PER_ADV_SLOW_INT_MIN, \
-		BT_GAP_PER_ADV_SLOW_INT_MAX, NULL)
 static void bt_ready(int err)
 {
 
@@ -76,6 +78,9 @@ int main(void)
 	int err;
 	struct sensor_value odr_attr;
 	int ret;
+	int64_t last_adc_measurement_time = -BATT_MEASUREMENT_INTERVAL_MS-1;
+	uint16_t voltage;
+
 
 	printk("Starting Beacon Demo\n");
 	/* Put the flash into deep power down mode
@@ -108,11 +113,11 @@ int main(void)
 	if (err) {
 		printk("Bluetooth init failed (err %d)\n", err);
 	}
-	ret = battery_init();
+	ret = battery_init(1/*adc_only*/);
 	if (ret)	{
 		printk("Failed to initialize battery management (error %d)", ret);
-		return ret;
 	}
+	battery_suspend();
 
 	do{
 		k_msleep(1000);
@@ -127,13 +132,16 @@ int main(void)
 		}
 
 
-		uint16_t voltage;
-
-		int ret = battery_get_millivolt(&voltage);
-		if (ret == 0) {
-		// Use the voltage value here
-			tlm_data[4] = (voltage >> 8) & 0xFF;
-			tlm_data[5] = voltage & 0xFF;
+		if(k_uptime_get() - last_adc_measurement_time > BATT_MEASUREMENT_INTERVAL_MS) {
+			battery_resume();
+			ret = battery_get_millivolt(&voltage);
+			if (ret == 0) {
+				// Use the voltage value here
+				tlm_data[4] = (voltage >> 8) & 0xFF;
+				tlm_data[5] = voltage & 0xFF;
+			}
+			last_adc_measurement_time = k_uptime_get();
+			battery_suspend();
 		}
 		/*update advertisement tlm data*/
 		tlm_data[8] = (heart_bit >> 24) & 0xFF;

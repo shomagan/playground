@@ -104,9 +104,24 @@ int battery_sample_once(void);
 
 /**
  * @brief Initialize the battery management system.
+ * @param adc_only If true, only initialize the ADC for voltage measurement. If false, initialize both ADC and GPIO for charging management.
  *
  * @retval 0 if successful. Negative errno number on error.
  */
-int battery_init(void);
+int battery_init(uint8_t adc_only);
+
+/**
+ * @brief Suspend battery monitoring.
+ *
+ * @retval 0 if successful. Negative errno number on error.
+ */
+int battery_suspend(void);
+
+/**
+ * @brief Resume battery monitoring.
+ *
+ * @retval 0 if successful. Negative errno number on error.
+ */
+int battery_resume(void);
 
 #endif

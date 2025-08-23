@@ -22,6 +22,7 @@
 #include <zephyr/drivers/gpio.h>
 #include <zephyr/drivers/adc.h>
 #include <zephyr/logging/log.h>
+#include <zephyr/pm/device.h>
 
 LOG_MODULE_REGISTER(battery, LOG_LEVEL_INF);
 
@@ -39,13 +40,13 @@ LOG_MODULE_REGISTER(battery, LOG_LEVEL_INF);
 //--------------------------------------------------------------
 // ADC setup
 
-#define ADC_RESOLUTION          DT_PROP(BATTERY_NODE, adc_resolution) 
-#define ADC_CHANNEL             DT_PROP(BATTERY_NODE, adc_channel_id) 
-#define ADC_PORT                DT_PROP(BATTERY_NODE, adc_channel) 
+#define ADC_RESOLUTION          DT_PROP(BATTERY_NODE, adc_resolution)
+#define ADC_CHANNEL             DT_PROP(BATTERY_NODE, adc_channel_id)
+#define ADC_PORT                DT_PROP(BATTERY_NODE, adc_channel)
 #define ADC_REFERENCE           DT_PROP(BATTERY_NODE, adc_reference)
-#define ADC_GAIN                DT_PROP(BATTERY_NODE, adc_gain) 
+#define ADC_GAIN                DT_PROP(BATTERY_NODE, adc_gain)
 #define ADC_SAMPLE_INTERVAL_US  DT_PROP(BATTERY_NODE, adc_sample_interval)
-#define ADC_ACQUISITION_TIME    DT_PROP(BATTERY_NODE, adc_acquisition_time) 
+#define ADC_ACQUISITION_TIME    DT_PROP(BATTERY_NODE, adc_acquisition_time)
 
 static struct adc_channel_cfg channel_7_cfg = {
     .gain = ADC_GAIN,
@@ -362,7 +363,7 @@ int battery_sample_once(void)
     return 0;
 }
 
-int battery_init()
+int battery_init(uint8_t adc_only)
 {
     int ret = 0;
 
@@ -379,76 +380,75 @@ int battery_init()
         LOG_ERR("ADC setup failed (error %d)", ret);
         return ret;
     }
-
-    // GPIO setup
-    if (!gpio_is_ready_dt(&charging_enable))
-    {
-        LOG_ERR("GPIO charging_enable not found!");
-        return -EIO;
-    }
-
-    if (!gpio_is_ready_dt(&read_enable))
-    {
+    if (!gpio_is_ready_dt(&read_enable)) {
         LOG_ERR("GPIO read_enable not found!");
         return -EIO;
     }
-
-    if (!gpio_is_ready_dt(&charge_speed))
-    {
-        LOG_ERR("GPIO charging_enable not found!");
-        return -EIO;
-    }
-
-    ret |= gpio_pin_configure_dt(&charging_enable, GPIO_INPUT | GPIO_ACTIVE_LOW);
-    if (ret)
-    {
-        LOG_ERR("Failed to configure GPIO_BATTERY_CHARGING_ENABLE pin (error %d)", ret);
-        return ret;
-    }
-
-    ret |= gpio_pin_interrupt_configure_dt(&charging_enable, GPIO_INT_EDGE_BOTH);
-    if (ret)
-    {
-        LOG_ERR("Failed to configure GPIO_BATTERY_CHARGING_ENABLE pin interrupt (error %d)", ret);
-        return ret;
-    }
-
     ret |= gpio_pin_configure_dt(&read_enable, GPIO_OUTPUT | GPIO_ACTIVE_LOW);
-    if (ret)
-    {
+    if (ret) {
         LOG_ERR("Failed to configure GPIO_BATTERY_READ_ENABLE pin (error %d)", ret);
         return ret;
     }
-    ret |= gpio_pin_configure_dt(&charge_speed, GPIO_OUTPUT | GPIO_ACTIVE_LOW);
-    if (ret)
-    {
-        LOG_ERR("Failed to configure GPIO_BATTERY_CHARGE_SPEED pin (error %d)", ret);
-        return ret;
-    }
 
-    // Battery workers
-    k_work_init_delayable(&sample_periodic_work, sample_periodic_handler);
-    k_work_init(&sample_once_work, sample_once_handler);
+    if(!adc_only){
+	// GPIO setup
+	if (!gpio_is_ready_dt(&charging_enable))
+	{
+		LOG_ERR("GPIO charging_enable not found!");
+		return -EIO;
+	}
 
-    // Charger interrupt setup
-    k_work_init(&charging_interrupt_work, run_charging_callbacks);
-    gpio_init_callback(&charging_callback, charging_callback_handler,
-                       BIT(charging_enable.pin));
-    gpio_add_callback_dt(&charging_enable, &charging_callback);
+	if (!gpio_is_ready_dt(&charge_speed))
+	{
+		LOG_ERR("GPIO charging_enable not found!");
+		return -EIO;
+	}
 
-    // Lets check the current charging status
-    bool is_charging = gpio_pin_get_dt(&charging_enable);
-    LOG_INF("Charger %s", is_charging ? "connected" : "disconnected");
+	ret |= gpio_pin_configure_dt(&charging_enable, GPIO_INPUT | GPIO_ACTIVE_LOW);
+	if (ret)
+	{
+		LOG_ERR("Failed to configure GPIO_BATTERY_CHARGING_ENABLE pin (error %d)", ret);
+		return ret;
+	}
 
-    is_initialized = true;
-    LOG_INF("Initialized");
+	ret |= gpio_pin_interrupt_configure_dt(&charging_enable, GPIO_INT_EDGE_BOTH);
+	if (ret)
+	{
+		LOG_ERR("Failed to configure GPIO_BATTERY_CHARGING_ENABLE pin interrupt (error %d)", ret);
+		return ret;
+	}
 
-    // Get ready for battery charging and sampling
-    ret |= battery_set_fast_charge();
-    if (ret)
-    {
-        LOG_ERR("Failed to set fast charging (error %d)", ret);
-        return ret;
+	ret |= gpio_pin_configure_dt(&charge_speed, GPIO_OUTPUT | GPIO_ACTIVE_LOW);
+	if (ret)
+	{
+		LOG_ERR("Failed to configure GPIO_BATTERY_CHARGE_SPEED pin (error %d)", ret);
+		return ret;
+	}
+
+	// Battery workers
+	k_work_init_delayable(&sample_periodic_work, sample_periodic_handler);
+	k_work_init(&sample_once_work, sample_once_handler);
+
+	// Charger interrupt setup
+	k_work_init(&charging_interrupt_work, run_charging_callbacks);
+	gpio_init_callback(&charging_callback, charging_callback_handler,
+			BIT(charging_enable.pin));
+	gpio_add_callback_dt(&charging_enable, &charging_callback);
+
+	// Lets check the current charging status
+	bool is_charging = gpio_pin_get_dt(&charging_enable);
+	LOG_INF("Charger %s", is_charging ? "connected" : "disconnected");
+
+	is_initialized = true;
+	LOG_INF("Initialized");
+
+	// Get ready for battery charging and sampling
+	ret |= battery_set_fast_charge();
+	if (ret)
+	{
+		LOG_ERR("Failed to set fast charging (error %d)", ret);
+		return ret;
+	}
     }
 
     ret |= battery_enable_read();
@@ -459,4 +459,10 @@ int battery_init()
     }
 
     return 0;
+}
+int battery_suspend(void){
+	return pm_device_action_run(adc_battery_dev, PM_DEVICE_ACTION_SUSPEND);
+}
+int battery_resume(void){
+	return pm_device_action_run(adc_battery_dev, PM_DEVICE_ACTION_RESUME);
 }
