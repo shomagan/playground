@@ -41,14 +41,24 @@ public:
             return "";
         }
         
-        // Dictionary access by key - returns proxy for chaining
         DictProxy operator[](const std::string& key) const {
-            if (dict_) {
-                return DictProxy(dict_->getDict(key));
+            if (!dict_) {
+                return DictProxy(nullptr);
             }
-            return DictProxy(nullptr);
-        }
-        
+            
+            // If it's an attribute (starts with @), try to get it directly as a string
+            if (!key.empty() && key[0] == '@') {
+                std::string attrValue = dict_->getString(key);
+                if (!attrValue.empty()) {
+                    auto tempDict = std::make_shared<XmlDict>();
+                    tempDict->set("#text", attrValue);
+                    return DictProxy(tempDict);
+                }
+            }
+            
+            // Otherwise, treat it as a nested dictionary
+            return DictProxy(dict_->getDict(key));
+        }        
         // Array access by index - returns proxy for chaining
         DictProxy operator[](int index) const {
             if (dict_ && dict_->data.size() == 1) {
@@ -213,10 +223,10 @@ private:
 public:
     XmlRoot(std::shared_ptr<XmlDict> root) : root_(root) {}
     
-    // Enable direct bracket access like Python
-    XmlDict::DictProxy operator[](const std::string& key) const {
+    template<typename T>
+    XmlDict::DictProxy operator[](const T& key) const {
         if (root_) {
-            return (*root_)[key];
+            return (*root_)[std::string(key)];
         }
         return XmlDict::DictProxy(nullptr);
     }

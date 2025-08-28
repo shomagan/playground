@@ -1,41 +1,201 @@
-<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
- xsi:noNamespaceSchemaLocation="config.xsd">
-    <host></host>
-    <guest name="guest1">
-        <interface>eth0</interface>
+<?xml version="1.0" encoding="UTF-8"?>
+
+<config>
+    <host version="1" name="hqx">
+    <!-- Host Network Configuration -->
+        <network id="0">
+        <!-- Car Network -->
+            <interfaces>
+                <interface name="emac0">
+                <!-- Physical Interface -->
+                    <mac>aa:aa:aa:aa:aa:aa</mac>
+                    <vlans>
+                    <!-- Virtual Interfaces -->
+                        <vlan>
+                            <id>33</id>
+                            <ipv4>192.168.133.4</ipv4>
+                            <netmask>255.255.255.0</netmask>
+                            <pcp>2</pcp>
+                        </vlan>
+                        <vlan>
+                            <id>103</id>
+                            <ipv4>192.168.203.5</ipv4>
+                            <netmask>255.255.255.0</netmask>
+                            <pcp>6</pcp>
+                        </vlan>
+                    </vlans>
+                    <dhcp allowed="false"/>
+                </interface>
+                <interface name="vp0">
+                <!-- Trunk Port Interface -->
+                    <mac>aa:aa:aa:aa:aa:ab</mac>
+                </interface>
+                <interface name="vp2">
+                <!-- Trunk Port Interface -->
+                    <mac>aa:aa:aa:aa:aa:ac</mac>
+                </interface>
+            </interfaces>
+            <vswitch name="bridge0">
+            <!-- Virtual Switch Interface -->
+                <maxaddr>300</maxaddr>
+                <timeout>120</timeout>
+                <ports>
+                    <port name="emac0">
+                        <maxaddr>100</maxaddr>
+                    </port>
+                    <port name="vp0">
+                        <maxaddr>100</maxaddr>
+                    </port>
+                    <port name="vp2">
+                        <maxaddr>100</maxaddr>
+                    </port>
+                </ports>
+            </vswitch>
+            <mapping>
+            <!-- Mapping VLAN's to PCP's -->
+               <vlans name="emac0">
+                  <vlan id="50" pcp="1" />
+                  <vlan id="80" pcp="1" />
+                  <vlan id="32" pcp="2" />
+                  <vlan id="33" pcp="2" />
+                  <vlan id="70" pcp="4" />
+                  <vlan id="20" pcp="6" />
+                  <vlan id="103" pcp="6" />
+                </vlans>
+            </mapping>
+            <firewall>
+            <!-- Firewall rules in network -->
+                <vlans name="emac0">
+                <!-- Traffic to be filter out based on L2 rules -->
+                    <vlan id="20" />
+                    <vlan id="32" />
+                    <vlan id="33" />
+                    <vlan id="50" />
+                    <vlan id="70" />
+                    <vlan id="80" />
+                    <vlan id="103" />
+                </vlans>
+                <rules>
+                <!-- Traffic to be passed through based on L3/L4 rules -->
+                    <rule ipSrc="any" ipDst="any" portSrc="any" portDst="any" proto="any" />
+                    <!--
+                    <rule ipSrc="192.168.120.0/24" ipDst="192.168.120.0/24" portSrc="any"   portDst="any"   proto="any" />
+                    <rule ipSrc="192.168.132.0/24" ipDst="192.168.132.0/24" portSrc="10000" portDst="20000" proto="tcp" />
+                    <rule ipSrc="192.168.133.0/24" ipDst="192.168.133.0/24" portSrc="10000" portDst="any"   proto="tcp" />
+                    <rule ipSrc="192.168.150.0/24" ipDst="192.168.150.0/24" portSrc="any"   portDst="20000" proto="tcp" />
+                    <rule ipSrc="192.168.170.0/24" ipDst="any"              portSrc="10000" portDst="any"   proto="tcp" />
+                    <rule ipSrc="any"              ipDst="192.168.172.0/24" portSrc="any"   portDst="20000" proto="udp" />
+                    <rule ipSrc="any"              ipDst="192.168.180.0/24" portSrc="10000" portDst="20000" proto="udp" />
+                    <rule ipSrc="any"              ipDst="any"              portSrc="10000" portDst="20000" proto="udp" />
+                    <rule ipSrc="any"              ipDst="any"              portSrc="10000" portDst="any"   proto="udp" />
+                    <rule ipSrc="any"              ipDst="any"              portSrc="any"   portDst="20000" proto="udp" />
+                    -->
+                </rules>
+            </firewall>
+            <route_add>
+            <!-- routes -->
+            <!-- route [-dfnqSstv] command { [[modifiers] args] } -->
+            <!-- route add -net 192.168.204.0/24 192.168.203.12 -->
+            <!-- route add -net 172.16.10.0/24 172.16.1.1 -->
+            <!--
+                <description net="192.168.204.0/24" gateway="192.168.203.12" />
+                <description net="192.168.205.0/24" gateway="192.168.203.13" />
+            -->
+            </route_add>
+            <qos>
+            <!-- under development -->
+            </qos>
+        </network>
+    </host>
+    <!-- Guest Network Configuration -->
+    <guest version="1" name="lv1">
+        <network id="0">
+        <!-- Car Network -->
+            <interfaces>
+                <interface name="eth0">
+                <!-- Physical Interface -->
+                    <mac>aa:aa:aa:aa:aa:b0</mac>
+                    <vlans>
+                    <!-- Virtual Interfaces -->
+                        <vlan>
+                            <id>20</id>
+                            <ipv4>192.168.120.36</ipv4>
+                            <netmask>255.255.255.0</netmask>
+                            <pcp>6</pcp>
+                        </vlan>
+                        <vlan>
+                            <id>32</id>
+                            <ipv4>192.168.132.5</ipv4>
+                            <netmask>255.255.255.0</netmask>
+                            <pcp>2</pcp>
+                        </vlan>
+                        <vlan>
+                            <id>33</id>
+                            <ipv4>192.168.133.3</ipv4>
+                            <netmask>255.255.255.0</netmask>
+                            <pcp>2</pcp>
+                        </vlan>
+                        <vlan>
+                            <id>103</id>
+                            <ipv4>192.168.203.4</ipv4>
+                            <netmask>255.255.255.0</netmask>
+                            <pcp>6</pcp>
+                        </vlan>
+                    </vlans>
+                </interface>
+            </interfaces>
+            <firewall>
+            <!-- Firewall rules in network -->
+                <rules>
+                <!-- Traffic to be filter out based on L3/L4 rules -->
+                    <rule ipSrc="any" ipDst="any" portSrc="any" portDst="any" proto="any" />
+                    <!--
+                    <rule ipSrc="192.168.120.0/24" ipDst="192.168.120.0/24" portSrc="any"   portDst="any"   proto="any" />
+                    <rule ipSrc="192.168.132.0/24" ipDst="192.168.132.0/24" portSrc="10000" portDst="20000" proto="tcp" />
+                    -->
+                </rules>
+            </firewall>
+        </network>
     </guest>
-    <guest name="guest2">
-        <interface>eth1</interface>
+    <!-- Guest Network Configuration -->
+    <guest version="1" name="la1">
+        <network id="0">
+        <!-- Car Network -->
+            <interfaces>
+                <interface id="eth0">
+                <!-- Physical Interface -->
+                    <mac>aa:aa:aa:aa:aa:c0</mac>
+                    <vlans>
+                    <!-- Virtual Interfaces -->
+                        <vlan>
+                            <id>32</id>
+                            <ipv4>192.168.132.2</ipv4>
+                            <netmask>255.255.255.0</netmask>
+                            <pcp>2</pcp>
+                        </vlan>
+                        <vlan>
+                            <id>70</id>
+                            <ipv4>192.168.170.1</ipv4>
+                            <netmask>255.255.255.0</netmask>
+                            <pcp>2</pcp>
+                        </vlan>
+                        <vlan>
+                            <id>103</id>
+                            <ipv4>192.168.203.3</ipv4>
+                            <netmask>255.255.255.0</netmask>
+                            <pcp>6</pcp>
+                        </vlan>
+                    </vlans>
+                </interface>
+            </interfaces>
+            <firewall>
+            <!-- Firewall rules in network -->
+                <rules>
+                <!-- Traffic to be filter out based on L3/L4 rules -->
+                    <rule ipSrc="192.168.101.1" ipDst="192.168.101.2" portSrc="12345" portDst="12345" proto="UDP" />
+                    <rule ipSrc="192.168.101.1" ipDst="192.168.101.3" portSrc="12345" portDst="12345" proto="TCP" />
+                </rules>
+            </firewall>
+        </network>
     </guest>
-    <firewall>
-        <!-- Firewall rules in network -->
-        <interface name="emac0">
-            <vlan name="vlan0">
-                <!-- Traffic to be passed through with PCP control based on L2 rules -->
-                <vlan id="20" pcp="6" />
-                <vlan id="25" pcp="1" />
-                <vlan id="32" pcp="2" />
-                <server_ip>192.168.2.1</server_ip>
-            </vlan>
-            <vlan name="vlan1">
-                <!-- Traffic to be passed through with PCP control based on L2 rules -->
-                <vlan id="20" pcp="6" />
-                <server_ip>192.168.1.1</server_ip>
-            </vlan>        
-        </interface>
-        <interface name="emac1">
-            <vlan name="vlan2">
-                <!-- Traffic to be passed through with PCP control based on L2 rules -->
-                <vlan id="20" pcp="6" />
-                <vlan id="25" pcp="1" />
-                <vlan id="32" pcp="2" />
-                <server_ip>192.168.2.1</server_ip>
-            </vlan>
-            <vlan name="vlan3">
-                <!-- Traffic to be passed through with PCP control based on L2 rules -->
-                <vlan id="20" pcp="6" />
-                <server_ip>192.168.1.1</server_ip>
-            </vlan>        
-        </interface>
-    </firewall>
 </config>

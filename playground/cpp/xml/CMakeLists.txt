@@ -1,3 +1,8 @@
+#sudo apt-get update && sudo apt-get install -y libxml2-dev pkg-config cmake build-essential
+#mkdir build
+#cmake ..
+#cmake --build . --target all;cmake --build . --target copy;cmake --build . --target test
+#
 cmake_minimum_required(VERSION 3.10)
 project(XmlParser CXX)
 set(PRJ_NAME xmlParser)
@@ -30,11 +35,13 @@ add_custom_target(install-deps
 add_custom_target(test
     COMMAND ./${PRJ_NAME}
     DEPENDS ${PRJ_NAME}
-    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
     COMMENT "Running Python-like XML access demo"
 )
-
-#add_custom_command(TARGET ${PRJ_NAME}.exe POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/cmake_link/${PRJ_NAME}.exe ${CMAKE_SOURCE_DIR}/)
-
-
-/
+# copy target
+add_custom_target(copy
+    COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/build/${PRJ_NAME} ${CMAKE_SOURCE_DIR}/
+    DEPENDS ${PRJ_NAME}
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+    COMMENT "copy executable file"
+)
