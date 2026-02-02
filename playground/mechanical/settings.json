@@ -1,0 +1,74 @@
+{
+   // Editor Settings
+   "editor.tabSize": 3,
+   "editor.insertSpaces": true,
+   "editor.detectIndentation": false,
+   "editor.rulers": [131],
+   "editor.trimAutoWhitespace": true,
+   "editor.renderWhitespace": "boundary",
+   "editor.wordWrap": "off",
+
+   // Files Settings
+   "files.trimTrailingWhitespace": true,
+   "files.insertFinalNewline": true,
+   "files.eol": "\n",
+
+   // C/C++ Extension Settings
+   "C_Cpp.formatting": "clangFormat",
+   "C_Cpp.clang_format_path": "",
+   "C_Cpp.clang_format_style": "file",
+   "C_Cpp.clang_format_fallbackStyle": "LLVM",
+
+   // Enable format on save for C files
+   "[c]": {
+      "editor.tabSize": 3,
+      "editor.insertSpaces": true,
+      "editor.formatOnSave": false,
+      "editor.defaultFormatter": "xaver.clang-format",
+      "editor.rulers": [131]
+   },
+
+   "[h]": {
+      "editor.tabSize": 3,
+      "editor.insertSpaces": true,
+      "editor.formatOnSave": false,
+      "editor.defaultFormatter": "ms-vscode.cpptools",
+      "editor.rulers": [131]
+   },
+
+   // Highlight trailing spaces and tabs
+   "files.trimFinalNewlines": true,
+
+   // Bracket pair colorization
+   "editor.bracketPairColorization.enabled": true,
+   "editor.guides.bracketPairs": "active",
+
+   // IntelliSense settings
+   "C_Cpp.intelliSenseEngine": "default",
+   "C_Cpp.errorSquiggles": "enabled",
+
+   // Code analysis
+   "C_Cpp.codeAnalysis.clangTidy.enabled": true,
+   "C_Cpp.codeAnalysis.clangTidy.checks.enabled": [
+      "readability-braces-around-statements",
+      "readability-identifier-naming",
+      "readability-uppercase-literal-suffix",
+      "modernize-use-nullptr",
+      "cppcoreguidelines-*",
+      "performance-*"
+   ],
+
+   // Enhanced diagnostics for formatting issues
+   "C_Cpp.vcFormat.newLine.beforeOpenBrace.block": "newLine",
+   "C_Cpp.vcFormat.newLine.beforeOpenBrace.function": "newLine",
+   "C_Cpp.vcFormat.newLine.beforeOpenBrace.type": "newLine",
+   "C_Cpp.vcFormat.newLine.beforeOpenBrace.namespace": "newLine",
+   "C_Cpp.vcFormat.newLine.beforeOpenBrace.lambda": "newLine",
+
+   // Show formatting problems in problems panel
+   "C_Cpp.formatting.enforceFormatStyle": true,
+   "C_Cpp.formatting.clangFormat.enabled": true,
+
+   // Workspace recommendations
+   "extensions.ignoreRecommendations": false
+}

@@ -1,0 +1,73 @@
+
+- Programming languages
+   C / C ++, Python
+- Knowledge of Agile, Scrum, and related methodologies
+   Agile, ASPICE 
+- Operating systems, platforms, and frameworks
+   FreeRTOS, Vector-OS(Autosar), QNX 7.1, Zephyr RTOS, Contiki-OS, TI-OS, MBED-OS, Arduino, ESP-IDF
+- Ethernet-related skills, e.g. protocols, hardware
+   hardware:
+      Ethernet-T1/Ethernet-Tx(10/100/1000), SGMII, RMII, MII
+      Various PHYs (Physical Layer chips) and Ethernet switch chip types
+   protocols:
+      IPV4, IPV6, ARP, IGMP, ICMP, TCP/UDP, VLAN, SNMP, TLS, macSec, IpSec
+      ModbusTCP, SomeIP, NTP
+   libs and API:
+      lwip, 6lowpan, BSD sockets api
+   
+   
+
+
+
+
+
+
+
+
+Cmake
+
+
+
+
+
+
+
+
+
+
+  +-----------------------------+
+  |Iar, Keil, Eclipse,          |
+  +-----------------------------+
+  |+---------------+-----------+|
+  || QT bare metal,| VS code   ||
+  |+---------------+-----------+|
+  ||         Cmake             ||
+  |+---------------------------+|
+  +-----------------------------+
+
+                                              +-------------------+                                   | | | | | | | | |
+                                              | Segger, Lauterbach|-----------------                +--------------------+
+                                              +-------------------+                 JTAG/SWD/BDM ---| Stm32, Atmel, TI,  |--
+                                                                                    fastboot     ---| Aurix TriCore,     |--
+                                                                                                 ---| Qualcomm,Espressif |--
+                                                                                                 ---|                    |--
+                                                                                                 ---|                    |--
+                                                                                                 ---|                    |--
+                                                                                                    +--------------------+
+                                                                                                      | | | | | | | | |
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
