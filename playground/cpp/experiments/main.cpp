@@ -10,16 +10,17 @@
 #include "swap_node_in_pairs.hpp"
 #include "maximum_score_for_k_pairs.hpp"
 #include "dp.hpp"
-#include "same_tree.hpp"
+#include "bin_tree.hpp"
 #include "common.hpp"
 #include "my_pow.hpp"
-#include "flag_sort.hpp"
+#include "sorting.hpp"
 #include "reverse_nodes_by_group.hpp"
 #include "reverse_nodes.hpp"
 #include "contains_duplicates.hpp"
 #include "valid_anagram.hpp"
 #include "unordered_set_or_map.hpp"
 #include "sliding_window.hpp"
+#include "heap_priority.hpp"
 int main(int argc, const char * argv[]) {
    /*input arg handle*/
    if (argc >= 2) {
@@ -113,16 +114,25 @@ int main(int argc, const char * argv[]) {
          DP climbStairs;
          int n = 4;
          std::cout << "climb ways " << climbStairs.climb_stairs_dp(n) << "\n";
-      }else if(argc == 2 && input_string.compare("same_tree") == 0) {
-         SameTree sameTree;
+      }else if(argc == 2 && input_string.compare("bin_tree") == 0) {
+         BinTree binTree;
          TreeNode a3(3, nullptr, nullptr);
          TreeNode a2(2, nullptr, nullptr);
          TreeNode a1(1, &a2, &a3);
          TreeNode b3(3, nullptr, nullptr);
-         TreeNode b2(2, nullptr, nullptr);
+         TreeNode b2(-2, nullptr, nullptr);
          TreeNode b1(1, &b2, &b3);
+         TreeNode c5(-4, nullptr, nullptr);
+         TreeNode c4(2, &c5, nullptr);
+         TreeNode c3(4, nullptr, &c4);
+         TreeNode c2(5, &c3, nullptr);
+         TreeNode c1(-1, &c2, nullptr);
+
          std::cout << "same tree output is:";
-         std::cout << sameTree.isSameTree(&a1, &b1) << "\n";
+         std::cout << binTree.isSameTree(&a1, &b1) << "\n";
+         std::cout << "max sum c1 is " << binTree.maxPathSum(&b1) << "\n";
+         std::cout << "max sum c1 is " << binTree.maxPathSum(&c1) << "\n";
+
       }else if(argc == 4 && input_string.compare("my_pow") == 0) {
          MyPow myPow;
          double x = std::stod(argv[2]);
@@ -130,11 +140,18 @@ int main(int argc, const char * argv[]) {
          std::cout << x << "^" << n << "=" ;
          std::cout << myPow.my_pow(x, n) << "\n";
       }else if(argc == 2 && input_string.compare("flag_sort") == 0) {
-         FlagSort flagSort;
+         Sorting flagSort;
          std::vector<int> nums = {2,0,1};
          std::cout << "flag sort output is:";
          flagSort.flag_sort(nums);
          for(int num : nums) {
+            std::cout << num << " ";
+         }
+         std::cout << "\n";
+         std::vector<unsigned int> nums2 = {3,6,4,1,3,4,1,4};
+         flagSort.counting_sort(nums2);
+         std::cout << "counting sort output is:";
+         for(unsigned int num : nums2) {
             std::cout << num << " ";
          }
          std::cout << "\n";
@@ -223,6 +240,30 @@ int main(int argc, const char * argv[]) {
          std::string t = "ABC";
          std::cout << "sliding window output is:";
          std::cout << slidingWindow.minWindow(s, t) << "\n";
+      }else if(argc == 2 && input_string.compare("heap_priority") == 0) {
+         HeapPriority heapPriority;
+         std::vector<int> nums = {2,3,1,5,6,4};
+         int k = 2;
+         std::cout << "heap priority output is:";
+         std::cout << heapPriority.findKthLargest_own_heap(nums, k) << "\n";
+         nums = {2,1};
+         k = 2;
+         std::cout << "heap priority output is:";
+         std::cout << heapPriority.findKthLargest_own_heap(nums, k) << "\n";
+         nums = {99,99};
+         k = 1;
+         std::cout << "heap priority output is:";
+         std::cout << heapPriority.findKthLargest_own_heap(nums, k) << "\n";
+         nums = {3,2,3,1,2,4,5,5,6};
+         k = 4;
+         std::cout << "heap priority output is:";
+         std::cout << heapPriority.findKthLargest_own_heap(nums, k) << "\n";
+         nums = {5,2,4,1,3,6,0};
+         k = 4;
+         std::cout << "heap priority output is:";
+         std::cout << heapPriority.findKthLargest_own_heap(nums, k) << "\n";
+
+
       }else {
          return 0;
       }
