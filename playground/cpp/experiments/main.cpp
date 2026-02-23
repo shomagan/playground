@@ -21,6 +21,7 @@
 #include "unordered_set_or_map.hpp"
 #include "sliding_window.hpp"
 #include "heap_priority.hpp"
+#include "stack_problems.hpp"
 int main(int argc, const char * argv[]) {
    /*input arg handle*/
    if (argc >= 2) {
@@ -148,10 +149,10 @@ int main(int argc, const char * argv[]) {
             std::cout << num << " ";
          }
          std::cout << "\n";
-         std::vector<unsigned int> nums2 = {3,6,4,1,3,4,1,4};
+         std::vector<int> nums2 = {3,6,4,1,3,4,1,4};
          flagSort.counting_sort(nums2);
          std::cout << "counting sort output is:";
-         for(unsigned int num : nums2) {
+         for(int num : nums2) {
             std::cout << num << " ";
          }
          std::cout << "\n";
@@ -223,6 +224,22 @@ int main(int argc, const char * argv[]) {
          for (std::string s: result){
             std::cout << s << "\n";
          }
+      }else if(argc == 2 && input_string.compare("distinct_arrays") == 0) {
+         UnorderedSetOrMap unorderedSetOrMap;
+         std::vector<int> nums = {1,2,1,3,4};
+         int k = 3;
+         int number_good_arrays = 0;
+         number_good_arrays = unorderedSetOrMap.subarraysWithKDistinct(nums, k);
+         std::cout << "number of distinct arrays with k uniq is: " << number_good_arrays << "\n";
+         nums = {2,1,1,1,2};
+         k = 1;
+         number_good_arrays = unorderedSetOrMap.subarraysWithKDistinct(nums, k);
+         std::cout << "number of distinct arrays with k uniq is: " << number_good_arrays << "\n";
+         nums = {1,1,1,1,1,1,1,1};
+         k = 2;
+         number_good_arrays = unorderedSetOrMap.subarraysWithKDistinct(nums, k);
+         std::cout << "number of distinct arrays with k uniq is: " << number_good_arrays << "\n";
+
       }else if(argc == 2 && input_string.compare("group_anagrams") == 0) {
          UnorderedSetOrMap unorderedSetOrMap;
          std::vector<std::string> strs = {"eat","tea","tan","ate","nat","bat"};
@@ -240,6 +257,18 @@ int main(int argc, const char * argv[]) {
          std::string t = "ABC";
          std::cout << "sliding window output is:";
          std::cout << slidingWindow.minWindow(s, t) << "\n";
+      }else if(argc == 2 && input_string.compare("stack_problems") == 0) {
+         StackProblems stackProblems;
+         std::string s = "()[]{}";
+         std::cout << "valid parentheses output is:";
+         std::cout << stackProblems.isValid(s) << "\n";
+         s = "([)]";
+         std::cout << "valid parentheses output is:";
+         std::cout << stackProblems.isValid(s) << "\n";
+         s = "([{}])";
+         std::cout << "valid parentheses output is:";
+         std::cout << stackProblems.isValid(s) << "\n";
+
       }else if(argc == 2 && input_string.compare("heap_priority") == 0) {
          HeapPriority heapPriority;
          std::vector<int> nums = {2,3,1,5,6,4};

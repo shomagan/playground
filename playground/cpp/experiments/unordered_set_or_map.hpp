@@ -97,75 +97,29 @@ public:   UnorderedSetOrMap(){};
       }
       return result;
    }
-   int vector_has_k_uniq(vector<int>& nums,int start, int end, int k){
-      if((end + 1 - start)>=k){
-         std::unordered_set<int> elements;
-         for(int i = start; i < end + 1; i++){
-            elements.insert(nums[i]);
-            if(elements.size()>k){
-               return 1;
-            }
-         }
-         if(elements.size() == k){
-            return 0;
-         }
-         return -1;
-      }else{
-         return -1;
-      }
-   }
-   void count_back(vector<int>& nums, int k, int & left, int & right,int & number_good_arrays){
-      /*left already moved*/
+   int find_distinct_up_to_k(vector<int>& nums, int k){
       int size = nums.size();
-      while (right > left && (right -left +1)>k){
-         /*anyway we need to check current array has k uniq or not */
-         int res = vector_has_k_uniq(nums, left, right, k);
-         if(res == 0){
-            for (int i = left; i <= right ; i++){
-               std::cout << nums[i] << " ";
+      int n = 0;
+      std::unordered_map<int, int> map;
+      int left  = 0;
+      int right = 0;
+      for (int right = 0; right < size; right++){
+         map[nums[right]]++;
+         while (map.size() > k){
+            if(map[nums[left]] == 1){
+               map.erase(nums[left]);
+            }else{
+               map[nums[left]]--;
             }
-            std::cout << "\n";
-            number_good_arrays++;
-            right--;
-         }else if(res == 1){
-            right--;
-         }else{
-            break;
+            left++;
          }
+         n += right - left + 1;
       }
+      return n;
    }
    int subarraysWithKDistinct(vector<int>& nums, int k) {
-      /*sliding window */
-      int size = nums.size();
-      int left = 0;
-      int right = left + k - 1;
-      int number_good_arrays = 0;
-      while ((size - left >= k) && (right < size)){
-         /*anyway we need to check current array has k uniq or not */
-         int res = vector_has_k_uniq(nums, left, right, k);
-         if(res == 0){
-            for (int i = left; i <= right ; i++){
-               std::cout << nums[i] << " ";
-            }
-            std::cout << "\n";
 
-            number_good_arrays++;
-            right++;
-            if(right >= size){
-               right--;
-               left++;
-               count_back(nums, k, left, right, number_good_arrays);
-               left++;
-            }
-         }else if(res == 1){
-            left++;
-            count_back(nums, k, left, right, number_good_arrays);
-            left++;
-         }else{
-            right++;
-         }
-      }
-      return number_good_arrays;
+      return find_distinct_up_to_k(nums, k) - find_distinct_up_to_k(nums, (k-1));
    }
 };
 #endif /* UNORDERED_SET_OR_MAP_HPP */
