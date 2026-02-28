@@ -121,5 +121,35 @@ public:   UnorderedSetOrMap(){};
 
       return find_distinct_up_to_k(nums, k) - find_distinct_up_to_k(nums, (k-1));
    }
+   bool find_next_start(std::unordered_set<std::string>& dict, std::string s, vector<bool>& seen, int start){
+      bool result = false;
+      if(s.length()==0){
+         return true;
+      }
+      for(int i = 1; i <= s.length(); i++){
+         if(dict.count(s.substr(0, i))){
+            std::cout << "check: " << s.substr( i) << "\n";
+            if(!seen[start + i]){
+               std::cout << "find next start for: " << s.substr(i) << "\n";
+               result = find_next_start(dict, s.substr(i), seen, start + i);
+            }else {
+               std::cout << "already seen: " << s.substr(i) << "\n";
+            }
+            if(result){
+               break;
+            }
+            seen[start + i] = true;
+         }else{
+            std::cout << "not found in dict: " << s.substr(0, i) << "\n";
+         }
+      }
+      return result;
+   }
+   bool wordBreak(std::string s, vector<string>& wordDict) {
+      std::unordered_set<string> dict(wordDict.begin(), wordDict.end());
+      vector<bool> seen(s.length() + 1, false);
+      int start = 0;
+      return find_next_start(dict, s, seen, start);
+   }
 };
 #endif /* UNORDERED_SET_OR_MAP_HPP */

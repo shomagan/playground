@@ -18,10 +18,12 @@
 #include "reverse_nodes.hpp"
 #include "contains_duplicates.hpp"
 #include "valid_anagram.hpp"
-#include "unordered_set_or_map.hpp"
+#include "unordered_set_or_map.hpp"/*hash*/
 #include "sliding_window.hpp"
 #include "heap_priority.hpp"
 #include "stack_problems.hpp"
+#include "matrix_problems.hpp"
+
 int main(int argc, const char * argv[]) {
    /*input arg handle*/
    if (argc >= 2) {
@@ -115,6 +117,10 @@ int main(int argc, const char * argv[]) {
          DP climbStairs;
          int n = 4;
          std::cout << "climb ways " << climbStairs.climb_stairs_dp(n) << "\n";
+         std::vector<string> result = climbStairs.generateParenthesis(3);
+         for (const auto& s : result) {
+            std::cout << s << "\n";
+         }
       }else if(argc == 2 && input_string.compare("bin_tree") == 0) {
          BinTree binTree;
          TreeNode a3(3, nullptr, nullptr);
@@ -217,6 +223,12 @@ int main(int argc, const char * argv[]) {
          std::string s = "leletcode";
          std::cout << "first unique character output is:";
          std::cout << unorderedSetOrMap.first_uniq_character(s) << "\n";
+      }else if(argc == 2 && input_string.compare("k_distinct") == 0) {
+         UnorderedSetOrMap unorderedSetOrMap;
+         std::vector<int> nums = {2,1,1,1,2};
+         std::cout << "number k distinct arrays is ";
+         std::cout << unorderedSetOrMap.subarraysWithKDistinct(nums, 1) << "\n";
+
       }else if(argc == 2 && input_string.compare("letter_combination") == 0) {
          UnorderedSetOrMap unorderedSetOrMap;
          std::string test = "23";
@@ -250,6 +262,12 @@ int main(int argc, const char * argv[]) {
             }
             std::cout << "\n";
          }
+      }else if(argc == 2 && input_string.compare("word_break") == 0) {
+         UnorderedSetOrMap unorderedSetOrMap;
+         std::string s = "aaaaaaaaaaaaaaaaaaaaaab";
+         std::vector<std::string> wordDict = {"a", "aa", "aaa", "aaaa", "aaaaa", "aaaaaaa"};
+         std::cout << "word break output is:";
+         std::cout << unorderedSetOrMap.wordBreak(s, wordDict) << "\n";
       }else if(argc == 2 && input_string.compare("sliding_window") == 0) {
          SlidingWindow slidingWindow;
          std::string s = "XADOBECODEBANC";
@@ -268,7 +286,38 @@ int main(int argc, const char * argv[]) {
          s = "([{}])";
          std::cout << "valid parentheses output is:";
          std::cout << stackProblems.isValid(s) << "\n";
-
+         s = "/home/";
+         std::cout << s << "\n";
+         std::cout << "simplify path output is:";
+         std::cout << stackProblems.simplifyPath(s) << "\n";
+         s = "/../";
+         std::cout << s << "\n";
+         std::cout << "simplify path output is:";
+         std::cout << stackProblems.simplifyPath(s) << "\n";
+         s = "/home//foo/";
+         std::cout << s << "\n";
+         std::cout << "simplify path output is:";
+         std::cout << stackProblems.simplifyPath(s) << "\n";
+         s = "/a/./b/../../c/";
+         std::cout << s << "\n";
+         std::cout << "simplify path output is:";
+         std::cout << stackProblems.simplifyPath(s) << "\n";
+         s = "/../";
+         std::cout << s << "\n";
+         std::cout << "simplify path output is:";
+         std::cout << stackProblems.simplifyPath(s) << "\n";
+         s = "/.../a/../b/c/../d/./";
+         std::cout << s << "\n";
+         std::cout << "simplify path output is:";
+         std::cout << stackProblems.simplifyPath(s) << "\n";
+         s = "/a//b////c/d//././/..";
+         std::cout << s << "\n";
+         std::cout << "simplify path output is:";
+         std::cout << stackProblems.simplifyPath(s) << "\n";
+         s = "/...";
+         std::cout << s << "\n";
+         std::cout << "simplify path output is:";
+         std::cout << stackProblems.simplifyPath(s) << "\n";
       }else if(argc == 2 && input_string.compare("heap_priority") == 0) {
          HeapPriority heapPriority;
          std::vector<int> nums = {2,3,1,5,6,4};
@@ -291,6 +340,53 @@ int main(int argc, const char * argv[]) {
          k = 4;
          std::cout << "heap priority output is:";
          std::cout << heapPriority.findKthLargest_own_heap(nums, k) << "\n";
+      }else if(argc == 2 && input_string.compare("matrix_problems") == 0) {
+         MatrixProblems matrixProblems;
+         std::vector<std::vector<int>> matrix = {{5,1,9,11},{2,4,8,10},{13,3,6,7},{15,14,12,16}};
+         for(const auto& row : matrix) {
+            for(int num : row) {
+               std::cout << num << " ";
+            }
+            std::cout << "\n";
+         }
+
+         std::cout << "rotate matrix output is:";
+         matrixProblems.rotate(matrix);
+         for(const auto& row : matrix) {
+            for(int num : row) {
+               std::cout << num << " ";
+            }
+            std::cout << "\n";
+         }
+         matrix = {{1,2},{3,4}};
+         for(const auto& row : matrix) {
+            for(int num : row) {
+               std::cout << num << " ";
+            }
+            std::cout << "\n";
+         }
+
+         std::cout << "rotate matrix output is:";
+         matrixProblems.rotate(matrix);
+         for(const auto& row : matrix) {
+            for(int num : row) {
+               std::cout << num << " ";
+            }
+            std::cout << "\n";
+         }
+         matrix = {{5,1,9,11},{2,4,8,10},{13,3,6,7},{15,14,12,16}};
+         for(const auto& row : matrix) {
+            for(int num : row) {
+               std::cout << num << " ";
+            }
+            std::cout << "\n";
+         }
+         std::cout << "spiral matrix is:";
+         std::vector<int> result = matrixProblems.matrix_walk(matrix);
+         for(const auto num : result) {
+            std::cout << num << " ";
+         }
+         std::cout << "\n";
 
 
       }else {

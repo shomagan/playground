@@ -4,7 +4,7 @@
 #include <algorithm>
 #include <limits>
 #include <string>
-
+#include <stack>
 /*You are given two integer arrays nums1 and nums2 of lengths n and m respectively, and an integer k.
 
 You must choose exactly k pairs of indices (i1, j1), (i2, j2), ..., (ik, jk) such that:
@@ -204,6 +204,58 @@ public:
          }
       }
       return combination_number[size-1];
+   }
+   void fill_lines(std::vector<std::string>& result, int control, int open, int close) {
+      size_t last_string = result.size()-1;
+      int open_added = 0;
+      std::string copy;
+      /*is there a variant to open*/
+      if (open && (close >= open)){
+         copy = result[last_string];
+         open_added = 1;
+         open--;
+         control++;
+         result[last_string].push_back('(');
+         fill_lines(result, control, open, close);
+      }
+      /*is there a variant to close*/
+      if(open_added){
+         /*need to create alternative new branch if possible*/
+         control--;
+         open++;
+         if (close && control){
+            close--;
+            control--;
+            /*create new one*/
+            result.push_back(copy);
+            last_string = result.size()-1;
+            result[last_string].push_back(')');
+            fill_lines(result, control, open, close);
+         }
+      }else{
+         /*just update current branch*/
+         if (close && control){
+            close--;
+            control--;
+            /*keep old track*/
+            result[last_string].push_back(')');
+            fill_lines(result, control, open, close);
+         }
+      }
+   }
+   std::vector<std::string> generateParenthesis(int n) {
+      int open = n;
+      int close = n;
+      int control = 0;
+      std::vector<std::string> result;
+      if (n){
+         control++;
+         std::string new_line("(");
+         result.push_back(new_line);
+         open--;
+         fill_lines(result, control, open, close);
+      }
+      return result;
    }
 
 };
