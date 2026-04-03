@@ -257,6 +257,68 @@ public:
       }
       return result;
    }
+   bool compare(std::string& s, std::string& p, int si, int pi){
+      /*i can try to make s from p
+      all characters should be taken
+      * gives as several ways -- each we should check, but we should not
+      check infinity variation only until it works
+      what is the result - if p passed and we have result equal to s? */
+      bool result = false;
+      std::cout << "init "<< pi << " " << si << " " << "\n";
+      if(pi == p.length() && si == s.length()){
+         return true;
+      }else if(pi == p.length() && si != s.length()){
+         return false;
+      }
+      if(p[pi] == '.'){
+         if(p.length() > pi + 1 && p[pi+1] == '*'){
+            /*not used*/
+            if(compare(s, p, si, pi + 2)){
+               return true;
+            }/*used*/
+            while(si < s.length()){
+               si++;
+               std::cout << "dot" << "\n";
+               if(compare(s, p, si, pi + 2)){
+                  return true;
+               }
+            }
+         }else{
+
+            if(si < s.length()){
+               return compare(s, p, si + 1, pi + 1);
+            }else{
+               return false;
+            }
+         }
+      }else{
+         /*english letter*/
+         if(p.length() > pi + 1 && p[pi+1] == '*'){
+            /*not used */
+            if(compare(s, p, si, pi + 2)){
+               return true;
+            }
+            /*used*/
+            while(si < s.length() && p[pi] == s[si]){
+               si++;
+               std::cout << "used "<< p[pi] << " " << pi+2 << " " << si << "\n";
+               if(compare(s, p, si, pi + 2)){
+                  return true;
+               }
+            }
+         }else{
+            if(si < s.length() && p[pi] == s[si]){
+               return compare(s, p, si+1, pi+1);
+            }else{
+               return false;
+            }
+         }
+      }
+      return false;
+   }
+   bool isMatch(std::string s, std::string p) {
+      return compare(s, p, 0, 0);
+   }
 
 };
 #endif // MAX_SUM_FOR_K_SEQ_PAIR_HPP

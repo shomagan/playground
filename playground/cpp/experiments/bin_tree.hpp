@@ -85,5 +85,69 @@ public:
       max_path_pass_left_to_right(root, max_sum);
       return max_sum;
    }
+    void goLeft(TreeNode* root, int& max,int current){
+        current++;
+        if(max < current){
+            max = current;
+        }
+        if(root->left){
+            goLeft(root->left, max, current);
+        }
+        if(root->right){
+            goLeft(root->right, max, current);
+        }
+    }
+    int maxDepth(TreeNode* root) {
+        int current = 0;
+        int max = 0;
+        if(root){
+            goLeft(root, max, current);
+        }
+        return max;
+    }
+    int goLeft(TreeNode* root, TreeNode* p, vector<TreeNode*>& p_path){
+        int result = 0;
+        p_path.push_back(root);
+        if(p_path.back()==p){
+            return 1;
+        }
+        if(root->left){
+            result = goLeft(root->left, p, p_path);
+            if(result){
+                return result;
+            }
+        }
+        if(root->right){
+            result = goLeft(root->right, p, p_path);
+            if(result){
+                return result;
+            }
+        }
+        p_path.pop_back();
+        return result;
+    }
+    template<typename T>
+    TreeNode* lowestCommonAncestor(TreeNode* root, TreeNode* p, TreeNode* q) {
+        /* we can move through all leaf and keep all ancestors
+         once we reached neccessery leaf we should store path of pointer?*/
+        vector<TreeNode*> p_path;
+        vector<TreeNode*> q_path;
+        if(root){
+            goLeft(root, p, p_path);
+            goLeft(root, q, q_path);
+            int i = 0;
+            for(i = 0;i < p_path.size() && i < q_path.size();i++){
+                if(p_path[i] != q_path[i] && i>0){
+                    return p_path[i-1];
+                }
+            }
+            if(i == p_path.size()){
+                return p_path.back();
+            }else{
+                return q_path.back();
+            }
+        }
+        return root;
+    }
 };
 #endif // BIN_TREE_HPP

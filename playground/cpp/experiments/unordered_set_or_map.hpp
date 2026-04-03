@@ -7,7 +7,18 @@
 #include <string>
 #include <utility>
 using namespace std;
-
+/*std::unordered_set<int> seen;
+for(int num : nums) {
+   if(seen.find(num) != seen.end()) {
+      return true;
+   }
+   seen.insert(num);
+}
+return false;
+count() - most readable for sets (returns 0 or 1)
+contains() - clearest intent (C++20+)
+find() != end() - traditional, works everywhere
+*/
 class UnorderedSetOrMap {
 public:   UnorderedSetOrMap(){};
    ~UnorderedSetOrMap(){};
@@ -150,6 +161,116 @@ public:   UnorderedSetOrMap(){};
       vector<bool> seen(s.length() + 1, false);
       int start = 0;
       return find_next_start(dict, s, seen, start);
+   }
+   int missingMultiple(vector<int>& nums, int k) {
+      /*100 elements [1;100]
+      k - start alwaye from k to k*1 k*2..k*n < 100 */
+      /*unordered_set<int>  will not return min*/
+      int n = 1;
+      unordered_set<int> nums_set;
+      for(auto& i: nums){
+         if(i%k==0){
+            nums_set.insert(i);
+         }
+      }
+      while(k*n <= 200){
+         if(nums_set.find(k*n)==nums_set.end()){
+               return k*n;
+         }
+         n++;
+      }
+      return 0;
+   }
+   string mergeCharacters(string s, int k) {
+      /*we can convert string to vector and manipulate it*/
+      /*merging seems to be a removing
+         aaabbbccc k = 1 aabbbccc abbbccc
+         abcabca*/
+      vector<char> array_s;
+      array_s.reserve(s.length());
+      /*translate to vector*/
+      for(auto& c:s){
+         array_s.push_back(c);
+      }
+      /*handle vector*/
+      int size = array_s.size();
+      int skip = 0;
+      for(int i = 0;i<size;i++){
+         if(array_s[i]!='\0'){
+               unordered_set<char> dont_check;
+               dont_check.insert(array_s[i]);
+               skip = 0;
+               for(int j = 1; j<=k+skip && j+i < size;j++){
+                  if(array_s[i+j] == '\0'){
+                     skip++;
+                  }else if(dont_check.find(array_s[i+j]) != dont_check.end()){
+                     array_s[i+j] = '\0';
+                     skip++;
+                  }else{
+                     dont_check.insert(array_s[i+j]);
+                  }
+               }
+         }
+      }
+      string merged;
+      merged.reserve(100);
+      for(auto& i: array_s){
+         if(i != '\0' ){
+               merged+=i;
+         }
+      }
+      return merged;
+   }
+   vector<int> minDistinctFreqPair(vector<int>& nums) {
+      vector<int> counts(101);
+      for(auto& i:nums){
+         counts[i]++;
+      }
+      int freq_min = 0;
+      int freq_max = 0;
+      for(int i = 1;i<counts.size();i++){
+         if(counts[i] !=0){
+               freq_min = counts[i];
+               for(int j = i+1;j<counts.size();j++){
+                  if(counts[j] > 0 && counts[j]!=counts[i]){
+                     return vector<int>({i, j});
+                  }
+               }
+         }
+      }
+      return {-1,-1};
+   }
+   bool isIsomorphic(string s, string t) {
+   /*the same length
+   aabbccdd -> eeffggii
+   abcb - cdcd
+   if we have replaced pair the same should be in all cases */
+      unordered_map<char, char> connection;
+
+      if(s.length()!= t.length()){
+         return false;
+      }else{
+         for(int i = 0;i < s.length();i++){
+               if(connection.find(s[i])==connection.end()){
+                  connection[s[i]] = t[i];
+               }else{
+                  if (t[i] != connection[s[i]]){
+                     return false;
+                  }
+               }
+         }
+         connection.clear();/*keep capacity*/
+         for(int i = 0;i < t.length();i++){
+            if(connection.find(t[i])==connection.end()){
+               connection[t[i]] = s[i];
+            }else{
+               if (s[i] != connection[t[i]]){
+                  return false;
+               }
+            }
+         }
+         return true;
+      }
    }
 };
 #endif /* UNORDERED_SET_OR_MAP_HPP */

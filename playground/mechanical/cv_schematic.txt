@@ -1,73 +1,43 @@
+  Embedded systems engineer with expertise in full-stack development from bare metal
+  programming to network protocols
+ .--------------------------------------------------------------------------.
+ | .------------------------------.  Windows, Linux(Ubuntu)                 |
+ | |FreeRTOS, QNX, Autosar(Vector)|  Jenkins                                |
+ | |ContikiOS, StratifyOS         |  .-----------------------------.        |
+ | |    .--------------.          |  |  Iar, Keil, Eclipse,        |        |
+ | |    |C/C++, Python,|          |  +-----------------------------+        |
+ | |    |Micropython,  |----------+--| .--------------+--------.   |        |
+ | |    |JavaScript,   |          |  | |QT bare metal,| VS code|   +--------+--.
+ | |    '--------------'          |  | +--------------+--------+   |        |  |
+ | |LWIP, littleFS, 6lowpan,      |  | |Make    , Cmake        |   +--------+  +--.
+ | |BSD socket                    |  | '-----------------------'   | OpenOcd|--'  |
+ | '------------------------------'  '-----------------------------'--------+     |
+ '-----------------------------------+-----------------------------+--------'     |
+     .-------------------.                                                        |
+ .---| Segger,Lauterbach,|<-------------------------------------------------------'
+ |   | STMdebug          |                            .---------.-----------------.
+ |   '-------------------'                            |STM32-FMC|                 |
+ |   .--------------.         | | | | | | | | |       +---------+ Displays,       |
+ '-->|  JTAG/SWD/BDM|       .--------------------.    |SPI, QSPI| External Memory,|
+     |  fastboot    |<----->| Stm32, Atmel, TI,  |----+---------+ DAC, ADC, PMIC  |
+     '--------------'    ---| Aurix TriCore,     |----|I2C, TWI |                 |
+                         ---| Qualcomm, Espressif|----+---------+---+-------------+
+                         ---|                    |----|UART, USB-CDC|PC-connection|
+                         ---|                    |----+-------------'             |
+                         ---|                    |----|Modbus, RTM                |
+                            '--------------------'    '---------------------------'
+                              | | | | | | | | |
+                             .+-+-+-+-+-+-+-+-+-----------------------.
+                             | Ethernet(RMII, RGMII, SGMII), USB-RNDIS|
+            .----------------+----------------------------------------+-----------.
+            | IPV4, IPV6, ARP, IGMP, ICMP, TCP/UDP, VLAN, SNMP, TLS, macSec, IpSec|
+            | ModbusTCP, SomeIP, NTP, HTTP                                        |
+            '---------------------------------------------------------------------'
 
-- Programming languages
-   C / C ++, Python
-- Knowledge of Agile, Scrum, and related methodologies
-   Agile, ASPICE 
-- Operating systems, platforms, and frameworks
-   FreeRTOS, Vector-OS(Autosar), QNX 7.1, Zephyr RTOS, Contiki-OS, TI-OS, MBED-OS, Arduino, ESP-IDF
-- Ethernet-related skills, e.g. protocols, hardware
-   hardware:
-      Ethernet-T1/Ethernet-Tx(10/100/1000), SGMII, RMII, MII
-      Various PHYs (Physical Layer chips) and Ethernet switch chip types
-   protocols:
-      IPV4, IPV6, ARP, IGMP, ICMP, TCP/UDP, VLAN, SNMP, TLS, macSec, IpSec
-      ModbusTCP, SomeIP, NTP
-   libs and API:
-      lwip, 6lowpan, BSD sockets api
-   
-   
-
-
-
-
-
-
-
-
-Cmake
-
-
-
-
-
-
-
-
-
-
-  +-----------------------------+
-  |Iar, Keil, Eclipse,          |
-  +-----------------------------+
-  |+---------------+-----------+|
-  || QT bare metal,| VS code   ||
-  |+---------------+-----------+|
-  ||         Cmake             ||
-  |+---------------------------+|
-  +-----------------------------+
-
-                                              +-------------------+                                   | | | | | | | | |
-                                              | Segger, Lauterbach|-----------------                +--------------------+
-                                              +-------------------+                 JTAG/SWD/BDM ---| Stm32, Atmel, TI,  |--
-                                                                                    fastboot     ---| Aurix TriCore,     |--
-                                                                                                 ---| Qualcomm,Espressif |--
-                                                                                                 ---|                    |--
-                                                                                                 ---|                    |--
-                                                                                                 ---|                    |--
-                                                                                                    +--------------------+
-                                                                                                      | | | | | | | | |
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+Operating Systems:   FreeRTOS, QNX, Autosar (Vector), ContikiOS, StratifyOS
+Programming Languages:   C/C++, Python, MicroPython, JavaScript
+Development Tools:   IAR, Keil, Eclipse, VS Code, Make, CMake, OpenOCD
+Microcontrollers and Processors:   STM32, Atmel, TI, Aurix TriCore, Qualcomm, Espressif, Motorola
+Communication:   Modbus, ModbusTCP, SomeIP, IPv4/IPv6, ARP, IGMP, ICMP, TCP/UDP, VLAN, SNMP, TLS, macSec, IPSec, NTP, HTTP
+Peripheri:   JTAG/SWD/BDM, STM32-FMC, SPI, QSPI, I2C, TWI, UART, USB-CDC, Ethernet(RMII, RGMII, SGMII), USB-RNDIS
+Libs:   LWIP, littleFS, 6lowpan, BSD socket

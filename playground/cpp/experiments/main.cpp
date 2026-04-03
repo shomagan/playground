@@ -23,9 +23,14 @@
 #include "heap_priority.hpp"
 #include "stack_problems.hpp"
 #include "matrix_problems.hpp"
-
+#include "binary_search_array.hpp"
+#include "queue_deque.hpp"
+#include "graph.hpp"
+#include "matrix.hpp"
+using namespace std;
 int main(int argc, const char * argv[]) {
    /*input arg handle*/
+
    if (argc >= 2) {
       std::string input_string = argv[1];
       if(argc == 3 && input_string.compare("longest_palindromic") == 0) {
@@ -37,6 +42,38 @@ int main(int argc, const char * argv[]) {
          int rows = std::stoi(argv[3]);
          std::cout << "zigzag output is:";
          std::cout << zigzag.convert(argv[2], rows) << "\n";
+      }else if(argc == 2 && input_string.compare("queue_deque") == 0) {
+         std::vector<int> nums(10, 1);
+         for(int i = 0; i < 10; i++){
+            nums[i] = i+1;
+         }
+         QueueDeque queueDeque(5, nums);
+      }else if(argc == 2 && input_string.compare("graph") == 0) {
+         Graph graph;
+         std::vector<std::vector<int>> roads = {{0,6,7},{0,1,2},{1,2,3},{1,3,3},{6,3,3},{3,5,1},{6,5,1},{2,5,1},{0,4,5},{4,6,2}};
+         std::cout << "graph output is: " << graph.countPaths(7, roads) << "\n";
+      }else if(argc == 2 && input_string.compare("binary_search_array") == 0) {
+         // try all combinations of heights 1-6, length 5
+         std::vector<int> h = {1,1,1,1,1};
+         BinarySearchArray binarySearchArray;
+         int found = 0;
+         for(int a=1;a<=6;a++)
+         for(int b=1;b<=6;b++)
+         for(int c=1;c<=6;c++)
+         for(int d=1;d<=6;d++)
+         for(int e=1;e<=6;e++){
+            std::vector<int> test = {a,b,c,d,e};
+            int yours = binarySearchArray.maxArea(test);
+            int brute = binarySearchArray.maxArea_brute(test);
+            if(yours != brute){
+                  std::cout << "FOUND: [" <<a<<","<<b<<","<<c<<","<<d<<","<<e<<"]\n";
+                  std::cout << "yours=" << yours << " correct=" << brute << "\n";
+                  found++;
+                  if(found>5) return 0;
+            }
+         }
+         if(!found) std::cout << "No difference found\n";
+
       }else if(argc == 3 && input_string.compare("reverse_integer") == 0) {
          ReverseInteger reverseInteger;
          int number = std::stoi(argv[2]);
@@ -121,6 +158,16 @@ int main(int argc, const char * argv[]) {
          for (const auto& s : result) {
             std::cout << s << "\n";
          }
+      }else if(argc == 2 && input_string.compare("reg_exp") == 0) {
+         DP regExp;
+         std::string s = "mississippi";
+         std::string p = "mis*is*ip*.";
+         std::cout << "reg exp output is:";
+         std::cout << regExp.isMatch(s, p) << "\n";
+         s = "aab";
+         p = "aab";
+         std::cout << "reg exp output is:";
+         std::cout << regExp.isMatch(s, p) << "\n";
       }else if(argc == 2 && input_string.compare("bin_tree") == 0) {
          BinTree binTree;
          TreeNode a3(3, nullptr, nullptr);

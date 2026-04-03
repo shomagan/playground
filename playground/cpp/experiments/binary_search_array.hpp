@@ -84,5 +84,39 @@ public:
       }
       return result;
    }
+   int maxArea(std::vector<int>& height) {
+      /*need to find max min of pair on maximum distance between */
+      int area = 0;
+      if(height.size()<2){
+         return area;
+      }else{
+         /*first two pair */
+         int a = 0;
+         int b = height.size()-1;
+         area = (b-a) * std::min(height[a],height[b]);
+         /*idea once we take wider from 0 to last ,we can improve situation only to make it higher
+         then we should keep taller side and move another one */
+         for(int i = 2; i < height.size(); i++){
+            if(height[a] > height[b]){
+               b--;
+            }else{
+               a++;
+            }
+            int new_area = (b-a) * std::min(height[a],height[b]);
+            if(new_area > area){
+               area = new_area;
+            }
+         }
+         return area;
+      }
+   }
+   // brute force correct answer
+   int maxArea_brute(std::vector<int> height) {
+      int area = 0;
+      for(int i = 0; i<height.size(); i++)
+         for(int j = i+1; j<height.size(); j++)
+               area = std::max(area, (j-i)*std::min(height[i],height[j]));
+      return area;
+   }
 };
 #endif // BINARY_SEARCH_ARRAY_HPP

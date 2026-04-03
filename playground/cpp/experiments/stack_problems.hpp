@@ -99,4 +99,67 @@ public:   StackProblems(){};
       return simply.substr(0, write_p);
    }
 };
+/*Implement the MinStack class:
+
+    MinStack() initializes the stack object.
+    void push(int val) pushes the element val onto the stack.
+    void pop() removes the element on the top of the stack.
+    int top() gets the top element of the stack.
+    int getMin() retrieves the minimum element in the stack.
+
+You must implement a solution with O(1) time complexity for each function.
+*/
+#include <cstdint>
+class MinStack {
+
+public:
+/*i could allocate vector with a size  30000 elements*/
+/*we can keep index of min all the time
+ but if we remove min with pop , how to find next min with in O(1)
+ sorting would do nlog(n) - no
+ if we know minimums all the time, maybe we dont need to know where exactly next
+ maybe we should know just value - how?
+ we can simply keep pair and every time keep min value for each new element*/
+    std::vector<pair<int,int>> min_stack;
+    int size = 0;
+    MinStack() {
+      min_stack.reserve(30000);
+    }
+
+    void push(int val) {
+      if(size==0){
+         min_stack[size].second = val;
+      }else{
+         if(val < min_stack[size-1].second){
+            min_stack[size].second = val;
+         }else{
+            min_stack[size].second = min_stack[size-1].second;
+         }
+      }
+      min_stack[size].first = val;
+      size++;
+    }
+
+    void pop() {
+      if(size){
+         size--;
+      }
+    }
+
+    int top() {
+      int result = 0;
+      if(size){
+         result = min_stack[size-1].first;
+      };
+      return result;
+    }
+
+    int getMin() {
+      int result = 0;
+      if(size){
+         result = min_stack[size-1].second;
+      };
+      return result;
+    }
+};
 #endif /* STACK_PROBLEMS_HPP */

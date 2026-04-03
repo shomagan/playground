@@ -19,17 +19,17 @@ def main():
     group.add_option("-d", "--dir", dest="directory", action="store",
                      help="path to images", default='Images')
     group.add_option("-w", "--width", dest="width", action="store", type="int",
-                     help="collag width", default=4000)
+                     help="collag width", default=3508)
     group.add_option("--he", "--height", dest="height", action="store", type="int",
-                     help="collag height", default=6000)
+                     help="collag height", default=4960)
     group.add_option("-l", "--logging_level", dest="loglevel", action="store",
                      help="DEBUG, INFO, WARNING, ERROR, CRITICAL", default='INFO')
     parser.add_option_group(group)
     (options, args) = parser.parse_args()
     logging.basicConfig(level=options.loglevel.upper())
     logging.info(__description__)
-    max_row = 3
-    max_line = 3
+    max_row = 6
+    max_line = 8
     position_row = 0
     position_line = 0
     file_number = 1
@@ -48,7 +48,7 @@ def main():
                     logging.debug(f"{dirpath}/{file_name} after rotating {w} {h}")
 
                 coefficient = calculate_coefficient(w, h, (options.width - (brim * (max_row - 1))) / max_row,
-                                              (options.height-(brim*(max_row-1))) / max_line)
+                                              (options.height-(brim*(max_line-1))) / max_line)
                 if position_row == 0 and position_line == 0:
                     collage_image = Image.new('RGB', (options.width, options.height))
                 image_data = image_data.resize((int(w * coefficient), int(h * coefficient)), Image.LANCZOS)
