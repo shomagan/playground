@@ -1,0 +1,4 @@
+app with the same behavior as in ..\..\python\listen_and_update\listen_server_main.py,
+code should be structured  and split between files ,
+avoid comments, code should be readable and match format in .clang-format file.
+need to use cross platform solutions such as bsd sockets

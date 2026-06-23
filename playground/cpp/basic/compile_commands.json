@@ -1,0 +1,7 @@
+[
+  {
+    "directory": "c:/_camlea/sources/eval_lib/playground/cpp/basic",
+    "command": "C:/MinGW/bin/g++.exe -std=c++17 -ffunction-sections -fdata-sections -g -O0 -fno-common -fmessage-length=0 -DCMAKE_LIBRARY_ARCHITECTURE=x64 -DTERMINAL_GAME=1 -Ic:/_camlea/sources/eval_lib/playground/cpp/basic -o test.exe main.cpp",
+    "file": "c:/_camlea/sources/eval_lib/playground/cpp/basic/main.cpp"
+  }
+]

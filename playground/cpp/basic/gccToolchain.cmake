@@ -1,0 +1,10 @@
+set(COMPILER_DIRECT C:/MinGW/bin)
+set(CMAKE_C_COMPILER ${COMPILER_DIRECT}/gcc.exe)
+set(CMAKE_CXX_COMPILER ${COMPILER_DIRECT}/g++.exe)
+set(CMAKE_ASM_COMPILER ${COMPILER_DIRECT}/g++.exe)
+set(CMAKE_OBJCOPY ${COMPILER_DIRECT}/objcopy.exe CACHE INTERNAL "")
+set(CMAKE_OBJDUMP ${COMPILER_DIRECT}/objdump.exe CACHE INTERNAL "")
+set(CMAKE_SIZE ${COMPILER_DIRECT}/size.exe CACHE INTERNAL "")
+
+set(CMAKE_CXX_FLAGS "-std=c++17 -g -O0 -fmessage-length=0")
+set(CMAKE_C_FLAGS "-std=gnu99 -g -O0 -fmessage-length=0")
