@@ -87,8 +87,6 @@ def generate_ut_cpp_template(path, filename):
  *
  *------------------------------------------------------------------------------
  *
- * Copyright 2024 Aptiv. All rights reserved.
- * Information Contained Herein Is Proprietary and Confidential
  *
  *------------------------------------------------------------------------------
  *
@@ -163,9 +161,6 @@ def generate_cmake_test(path):
     if not os.path.isfile(path+'/' + cmake_filename):
         cmake_file = open(path+'/' + cmake_filename, 'w', encoding="utf-8")
         cmake_file.write("""
-# ---------------------------------------------------------------------------
-# Copyright © 2024 Aptiv. All rights reserved.
-# Information Contained Herein Is Proprietary and Confidential
 # ---------------------------------------------------------------------------
 
 add_subdirectory(unit)

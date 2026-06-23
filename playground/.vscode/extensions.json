@@ -1,5 +1,4 @@
 {
-   // Recommended VS Code extensions for Aptiv C Coding Standards
    "recommendations": [
       "llvm-vs-code-extensions.vscode-clangd",
       "xaver.clang-format",           // Clang-Format integration
