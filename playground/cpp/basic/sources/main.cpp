@@ -1,4 +1,6 @@
+#include <atomic>
 #include <chrono>
+#include <csignal>
 #include <filesystem>
 #include <memory>
 #include <thread>
@@ -12,10 +14,15 @@
 static const std::string DEFAULT_DESC_FILE = "devices_description.json";
 static const std::string LOG_DIR = "data_log";
 
-static std::pair<std::string, std::string> parse_args(int argc, const char *argv[])
-{
+static std::atomic<bool> g_stop_requested{ false };
+
+static void handle_stop_signal(int) {
+   g_stop_requested.store(true);
+}
+
+static std::pair<std::string, std::string> parse_args(int argc, const char *argv[]) {
    std::string desc_file = DEFAULT_DESC_FILE;
-   std::string log_level = "INFO";
+   std::string log_level = "DEBUG";
    for (int i = 1; i < argc - 1; i++) {
       std::string arg = argv[i];
       if (arg == "-d")
@@ -23,15 +30,17 @@ static std::pair<std::string, std::string> parse_args(int argc, const char *argv
       else if (arg == "-l")
          log_level = argv[i + 1];
    }
-   return {desc_file, log_level};
+   return { desc_file, log_level };
 }
 
-int main(int argc, const char *argv[])
-{
+int main(int argc, const char *argv[]) {
 #ifdef _WIN32
    WSADATA wsa;
    WSAStartup(MAKEWORD(2, 2), &wsa);
 #endif
+
+   std::signal(SIGINT, handle_stop_signal);
+   std::signal(SIGTERM, handle_stop_signal);
 
    auto [desc_file, log_level] = parse_args(argc, argv);
    Logger::set_level(log_level);
@@ -52,19 +61,18 @@ int main(int argc, const char *argv[])
       std::string key = get_ch();
       if (!key.empty()) {
          Logger::debug("key: ", key);
-         if (key == "q") {
-            Logger::info("exit");
-            {
-               std::lock_guard<std::mutex> lock(shared->mtx);
-               shared->running = false;
-            }
-            break;
-         }
       }
 
-      double elapsed = std::chrono::duration<double>(
-                          std::chrono::steady_clock::now() - last_check)
-                          .count();
+      if (key == "q" || g_stop_requested.load()) {
+         Logger::info("exit");
+         {
+            std::lock_guard<std::mutex> lock(shared->mtx);
+            shared->running = false;
+         }
+         break;
+      }
+
+      double elapsed = std::chrono::duration<double>(std::chrono::steady_clock::now() - last_check).count();
       if (elapsed >= 5.0) {
          Description new_desc;
          if (load_description(desc_file, new_desc)) {

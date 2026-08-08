@@ -3,19 +3,19 @@
   {
     "mdb_address" :4,
     "device_name" :"morse",
-    "spaces":[{ 
+    "spaces":[{
       "var_name" :"morse_unit_time_ms",
       "function"  :"write",
       "value" :130
       },
-      { 
+      {
       "var_name" :"morse_unit_time_ms",
       "function"  :"write",
       "value" :130
     }
     ]
   },
-  { 
+  {
     "mdb_address" :5,
     "device_name" :"morse",
     "spaces":[{ "var_name" :"reset_num",
@@ -29,15 +29,33 @@
       { "var_name" :"fw_version",
       "function"  :"read",
       "interval_sec"  :500,
-      "value" :0}       
+      "value" :0}
     ]
   },
-  { 
+  {
     "mdb_address" :13,
     "device_name" :"feeder",
     "spaces":[
       {
        "var_name" :"feeder_counter",
+       "function"  :"read",
+       "interval_sec"  :300,
+       "value" :0
+      },
+      {
+        "var_name" :"reset_num",
+        "function"  :"read",
+        "interval_sec"  :300,
+        "value" :0
+      }
+    ]
+  },
+  {
+    "mdb_address" :14,
+    "device_name" :"sofi_plc",
+    "spaces":[
+      {
+       "var_name" :"test_pwm_value",
        "function"  :"read",
        "interval_sec"  :300,
        "value" :0

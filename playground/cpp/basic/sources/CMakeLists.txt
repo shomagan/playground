@@ -13,7 +13,7 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(nlohmann_json)
 
 include(gccToolchain.cmake)
-project(${PRJ_NAME} C CXX ASM)
+project(${PRJ_NAME} C CXX)
 
 include_directories(${CMAKE_SOURCE_DIR})
 
@@ -28,10 +28,10 @@ set(COMMON_SOURCES
 
 file(GLOB COMMON_HEADERS ${CMAKE_SOURCE_DIR}/*.hpp ${CMAKE_SOURCE_DIR}/*.h)
 
-add_executable(${PRJ_NAME}.exe ${COMMON_SOURCES} ${COMMON_HEADERS})
+add_executable(${PRJ_NAME} ${COMMON_SOURCES} ${COMMON_HEADERS})
 
-target_link_libraries(${PRJ_NAME}.exe nlohmann_json::nlohmann_json)
+target_link_libraries(${PRJ_NAME} nlohmann_json::nlohmann_json)
 
 if(WIN32)
-   target_link_libraries(${PRJ_NAME}.exe ws2_32)
+   target_link_libraries(${PRJ_NAME} ws2_32)
 endif()

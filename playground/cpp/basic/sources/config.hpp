@@ -3,23 +3,20 @@
 #include <string>
 #include <vector>
 
-struct Space
-{
+struct Space {
    std::string var_name;
    std::string function;
    double value = 0.0;
    double interval_sec = 0.0;
 };
 
-struct Device
-{
+struct Device {
    int mdb_address = 0;
    std::string device_name;
    std::vector<Space> spaces;
 };
 
-struct Description
-{
+struct Description {
    std::vector<Device> devices;
 };
 

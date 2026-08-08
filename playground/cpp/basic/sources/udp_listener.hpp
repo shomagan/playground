@@ -5,8 +5,7 @@
 
 #include "config.hpp"
 
-struct SharedState
-{
+struct SharedState {
    std::mutex mtx;
    Description desc;
    bool desc_updated = false;

@@ -3,8 +3,7 @@
 #ifdef _WIN32
 #include <conio.h>
 
-std::string get_ch()
-{
+std::string get_ch() {
    if (_kbhit()) {
       char c = static_cast<char>(_getch());
       return std::string(1, c);
@@ -18,11 +17,11 @@ std::string get_ch()
 #include <termios.h>
 #include <unistd.h>
 
-std::string get_ch()
-{
+std::string get_ch() {
    int fd = STDIN_FILENO;
    struct termios old_term, new_term;
-   tcgetattr(fd, &old_term);
+   if (tcgetattr(fd, &old_term) != 0)
+      return "";
    new_term = old_term;
    new_term.c_lflag &= static_cast<tcflag_t>(~(ICANON | ECHO));
    tcsetattr(fd, TCSANOW, &new_term);
@@ -30,7 +29,7 @@ std::string get_ch()
    fd_set readfds;
    FD_ZERO(&readfds);
    FD_SET(fd, &readfds);
-   struct timeval tv{0, 0};
+   struct timeval tv{ 0, 0 };
 
    std::string result;
    if (select(fd + 1, &readfds, nullptr, nullptr, &tv) > 0) {

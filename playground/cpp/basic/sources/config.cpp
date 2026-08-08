@@ -7,8 +7,7 @@
 
 using json = nlohmann::json;
 
-bool load_description(const std::string &file_path, Description &desc)
-{
+bool load_description(const std::string &file_path, Description &desc) {
    std::ifstream file(file_path);
    if (!file.is_open()) {
       Logger::info("did't find file description - ", file_path);
@@ -39,8 +38,7 @@ bool load_description(const std::string &file_path, Description &desc)
    }
 }
 
-bool descriptions_equal(const Description &a, const Description &b)
-{
+bool descriptions_equal(const Description &a, const Description &b) {
    if (a.devices.size() != b.devices.size())
       return false;
    for (size_t i = 0; i < a.devices.size(); i++) {
