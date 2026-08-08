@@ -81,4 +81,51 @@ The test cases are generated such that the number of unique combinations that su
          current.pop_back();
       }
    }
+   vector<vector<int>> combine(int n, int k) {
+      /*if we  take first element always 1, we should eliminate it for further use
+        1 2 3, if n and k are equal we have only one combination
+        */
+      vector<vector<int>> result;
+      vector<int> current;
+      backtrack_combine(result, current, 0, 1, n, k);
+      return result;
+   }
+
+ private:
+   void backtrack_combine(vector<vector<int>> &result, vector<int> &current, int added, int current_index, int n, int k) {
+      if (added == k) {
+         result.push_back(current);
+         return;
+      }
+      /*if(n - current_index < k - added ){
+            return;
+        }*/
+
+      for (int i = current_index; i <= n; i++) {
+         current.push_back(i);
+         backtrack_combine(result, current, added + 1, i + 1, n, k);
+         current.pop_back();
+      }
+   }
+   void backtracking(vector<int> &nums, vector<int> &current, vector<vector<int>> &result, int from, int size) {
+      if (current.size() == size) {
+         result.push_back(current);
+         return;
+      }
+      for (int i = from; i < nums.size(); i++) {
+         current.push_back(nums[i]);
+         backtracking(nums, current, result, i + 1, size);
+         current.pop_back();
+      }
+   }
+   vector<vector<int>> subsets(vector<int> &nums) {
+      /* each element should be uniq [1, 2] thea same to [2, 1] */
+      vector<vector<int>> result;
+      vector<int> current;
+      for (int i = 0; i <= nums.size(); i++) {
+         current.clear();
+         backtracking(nums, current, result, 0, i);
+      }
+      return result;
+   }
 };
