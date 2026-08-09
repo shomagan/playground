@@ -4,6 +4,7 @@
 #include <chrono>
 #include <cmath>
 #include <fstream>
+#include <iomanip>
 #include <nlohmann/json.hpp>
 #include <optional>
 #include <sstream>
@@ -101,7 +102,7 @@ static void handle_read(const std::string &address, const Device &device, const 
    if (result && result->contains("value")) {
       double now = std::chrono::duration<double>(std::chrono::system_clock::now().time_since_epoch()).count();
       std::ofstream out(file_name, std::ios::app);
-      out << now << "; " << (*result)["value"] << "\n";
+      out << std::fixed << std::setprecision(3) << now << "; " << (*result)["value"] << "\n";
    }
 }
 
