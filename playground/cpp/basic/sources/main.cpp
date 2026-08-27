@@ -22,7 +22,7 @@ static void handle_stop_signal(int) {
 
 static std::pair<std::string, std::string> parse_args(int argc, const char *argv[]) {
    std::string desc_file = DEFAULT_DESC_FILE;
-   std::string log_level = "DEBUG";
+   std::string log_level = "INFO";
    for (int i = 1; i < argc - 1; i++) {
       std::string arg = argv[i];
       if (arg == "-d")
@@ -85,7 +85,7 @@ int main(int argc, const char *argv[]) {
          last_check = std::chrono::steady_clock::now();
       }
 
-      std::this_thread::sleep_for(std::chrono::milliseconds(10));
+      std::this_thread::sleep_for(std::chrono::milliseconds(100));
    }
 
    listener_thread.join();

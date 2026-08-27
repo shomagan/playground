@@ -72,7 +72,22 @@ static void handle_write(const std::string &address, const Space &space) {
       Logger::debug("write result - ", wr_result ? wr_result->dump() : "null");
    }
 }
-
+static void add_line(const std::string &file_name, const json &result) {
+   double now = std::chrono::duration<double>(std::chrono::system_clock::now().time_since_epoch()).count();
+   auto tp = std::chrono::system_clock::now();
+   std::time_t now_c = std::chrono::system_clock::to_time_t(tp);
+   std::tm* local = std::localtime(&now_c);
+   int year   = local->tm_year + 1900; // Years since 1900
+   int month  = local->tm_mon + 1;     // Months 0-11 -> 1-12
+   int day    = local->tm_mday;
+   int hours  = local->tm_hour;
+   int mins   = local->tm_min;
+   int secs   = local->tm_sec;
+   std::ofstream out(file_name, std::ios::app);
+   
+   out << std::fixed << std::setprecision(3) << now << "; " << result["value"] << "; " << year << "-" << month << "-" << day << " "
+            << hours << ":" << mins << ":" << secs << "\n";
+}
 static void handle_read(const std::string &address, const Device &device, const Space &space) {
    std::string file_name =
       LOG_DIR + "/" + device.device_name + "_" + std::to_string(device.mdb_address) + "_" + space.var_name + ".csv";
@@ -85,31 +100,32 @@ static void handle_read(const std::string &address, const Device &device, const 
             double last_time = std::stod(last_line->substr(0, sep));
             double now = std::chrono::duration<double>(std::chrono::system_clock::now().time_since_epoch()).count();
             Logger::debug("last_time - ", last_time);
-            if (std::abs(now - last_time) <= space.interval_sec)
+            if (std::abs(now - last_time) <= space.interval_sec){
                update = false;
+            }
          } catch (...) {
          }
       }
    }
 
-   if (!update)
+   if (!update){
       return;
+   }
 
    std::string req = R"({"request":"regs","reg_num":1,"get_type":"only_value","name":")" + space.var_name + R"("})";
    auto result = send_request(address, req);
    Logger::debug("read result - ", result ? result->dump() : "null");
 
    if (result && result->contains("value")) {
-      double now = std::chrono::duration<double>(std::chrono::system_clock::now().time_since_epoch()).count();
-      std::ofstream out(file_name, std::ios::app);
-      out << std::fixed << std::setprecision(3) << now << "; " << (*result)["value"] << "\n";
+      add_line(file_name, *result);
    }
 }
 
 void update_vars(const std::string &address, const Device &device) {
    for (const auto &space : device.spaces) {
-      if (space.function.empty() || space.var_name.empty())
+      if (space.function.empty() || space.var_name.empty()){
          continue;
+      }
       if (space.function == "write") {
          handle_write(address, space);
       } else if (space.function == "read") {

@@ -50,12 +50,20 @@ docker run -d --network host --name listen_server \
   -v $(pwd)/data_log:/app/data_log \
   listen_server
 ```
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+```sh
+sudo systemctl enable docker
+```
+```sh
+docker update --restart unless-stopped listen_server
+```
 
 Or, if using a named volume to keep data across restarts without a host path:
 
 ```sh
 docker run -d --network host --name listen_server \
-  -v listen_server_data:/app/data_log \
+  --restart unless-stopped \
+  -v ~/sources/playground/playground/cpp/basic/data_log:/app/data_log \
   listen_server
 ```
 
