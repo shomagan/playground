@@ -121,25 +121,6 @@ def udp_list(description_queue):
             break
 
 
-def get_ch():
-    if PLATFORM == "win":
-        ch = msvcrt.getch()
-        return ch
-    elif PLATFORM == "unix":
-        fd = sys.stdin.fileno()
-        old_setting = termios.tcgetattr(fd)
-        try:
-            tty.setraw(sys.stdin.fileno())
-            i, o, e = select([sys.stdin.fileno()], [], [], 5)
-            if i:
-                ch = sys.stdin.read(1)
-            else:
-                ch = ""
-        finally:
-            termios.tcsetattr(fd, termios.TCSADRAIN, old_setting)
-        return ch
-    else:
-        return ""
 
 
 def get_description(description_file_name, description_dic):
