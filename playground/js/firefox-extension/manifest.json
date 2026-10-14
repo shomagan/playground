@@ -1,0 +1,37 @@
+{
+  "manifest_version": 3,
+  "name": "Redbubble Metadata Filler",
+  "version": "0.4.1",
+  "description": "Fills title, tags and description on Redbubble's Add new work page from the metadata embedded in the chosen JPEG. You still press Save.",
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "redbubble-metadata-filler@local",
+      "strict_min_version": "140.0",
+      "data_collection_permissions": {
+        "required": [
+          "none"
+        ]
+      }
+    }
+  },
+  "icons": {
+    "48": "icon.svg",
+    "96": "icon.svg"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://www.redbubble.com/portfolio/images/new*",
+        "https://www.redbubble.com/*/portfolio/images/new*"
+      ],
+      "js": [
+        "metadata.js",
+        "content.js"
+      ],
+      "css": [
+        "panel.css"
+      ],
+      "run_at": "document_idle"
+    }
+  ]
+}
