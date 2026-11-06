@@ -1,9 +1,10 @@
 import last_version
 import requests
 import json
+import logging
+import sys
 import time
-from urllib3.util.retry import Retry
-from requests.adapters import HTTPAdapter
+from decorators import retry, timed
 from telegram_api import send_message
 
 CRC_BLOCK = 1 << 0
@@ -28,28 +29,31 @@ STRESS_TEST = 1 << 30
 PERFORMANCE_TEST = 1 << 31
 
 
+@timed
+@retry(times=3, delay=0.5, exceptions=(requests.RequestException,))
+def plc_get(json_request):
+    response = requests.get('http://' + last_version.plc_ip_address + ':80/get_json.cgi',
+                            headers={'Json': json_request}, timeout=5)
+    response.raise_for_status()
+    return response
+
+
+@timed
 def main():
     result = "failure"
-    s = requests.Session()
-    retries = Retry(total=3, backoff_factor=0.5, status_forcelist=[500, 502, 503, 504])
-    s.mount('http://', HTTPAdapter(max_retries=retries))
-
     test_flags = CHECK_TEST | CRC_BLOCK | RTC_BLOCK | DI_BLOCK | DO_BLOCK | AI_BLOCK | INTERNAL_FLASH_BLOCK |\
                  EXTERNAL_FLASH_BLOCK | FREERTOS_BLOCK | MATH_BLOCK | UART_BLOCK | MESO_BLOCK |\
                  RANDOM_BLOCK | CAN_BLOCK | PACKET_BLOCK | REPEATER_BLOCK | LFS_BLOCK | ETHERNET_BLOCK
-    response = requests.get('http://'+last_version.plc_ip_address+':80/get_json.cgi',
-                            headers={'Json': '{{"request":"regs_set","name":"sofi_test_blocks","value": {}}}'.format(test_flags)})
+    plc_get('{{"request":"regs_set","name":"sofi_test_blocks","value": {}}}'.format(test_flags))
     time.sleep(0.1)
     for i in range(30):
-        response = requests.get('http://'+last_version.plc_ip_address+':80/get_json.cgi',
-                            headers={'Json': '{"request":"regs","reg_num":1,"get_type":"only_value","name":"run_test"}'})
+        response = plc_get('{"request":"regs","reg_num":1,"get_type":"only_value","name":"run_test"}')
         time.sleep(2)
         json_data = json.loads(response.content)
         if 'value' in json_data:
             if json_data['value'] == 0:
                 break
-    response = requests.get('http://'+last_version.plc_ip_address+':80/get_json.cgi',
-                            headers={'Json': '{"request":"regs","reg_num":1,"get_type":"only_value","name":"sofi_test_result"}'})
+    response = plc_get('{"request":"regs","reg_num":1,"get_type":"only_value","name":"sofi_test_result"}')
     json_data = json.loads(response.content)
     if 'value' in json_data:
         test_flags_res = json_data['value'] | CHECK_TEST
@@ -66,4 +70,7 @@ def main():
 
 
 if __name__ == "__main__":
+    # stdout, not stderr: Jenkins captures stdout (returnStdout) and searches it for "success",
+    # and stderr output from a native exe can fail the powershell step.
+    logging.basicConfig(stream=sys.stdout, level=logging.INFO, format="%(levelname)s %(message)s")
     main()
